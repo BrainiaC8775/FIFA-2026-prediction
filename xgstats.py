@@ -18,25 +18,36 @@ train_xg['total_goals'] = train_xg['home_goals'] + train_xg['away_goals']
 train_xg = train_xg.sort_values("date")
 
 train_xg["home_xGF_roll"] = train_xg.groupby("home_team")["home_xGF"]\
-    .transform(lambda x: x.rolling(5, min_periods=1).mean())
+    .transform(lambda x: x.ewm(span=5).mean())
 
 train_xg["away_xGF_roll"] = train_xg.groupby("away_team")["away_xGF"]\
-    .transform(lambda x: x.rolling(5, min_periods=1).mean())
+    .transform(lambda x: x.ewm(span=5).mean())
 
-train_xg['home_xGF_roll'] = train_xg['home_xGF_roll'].clip(0.2, 4)
-train_xg['away_xGF_roll'] = train_xg['away_xGF_roll'].clip(0.2, 4)
+train_xg['home_xGF_roll'] = train_xg['home_xGF_roll'].clip(0.3, 3.5)
+train_xg['away_xGF_roll'] = train_xg['away_xGF_roll'].clip(0.3, 3.5)
 
 # Calculate rolling avgs of xG on test dataset
 test_xg = test_xg.sort_values("date")
 
-test_xg["home_xGF_roll"] = test_xg.groupby("home_team")["home_xGF"]\
-    .transform(lambda x: x.rolling(5, min_periods=1).mean())
+# For test set, we need to use the rolling xG from train set. So we concatenate and then calculate rolling xG.
+full_df = pd.concat([train_xg, test_xg]).sort_values("date")
+full_df['date'] = pd.to_datetime(full_df['date'])
 
-test_xg["away_xGF_roll"] = test_xg.groupby("away_team")["away_xGF"]\
-    .transform(lambda x: x.rolling(5, min_periods=1).mean())
+full_df["home_xGF_roll"] = full_df.groupby("home_team")["home_xGF"]\
+    .transform(lambda x: x.shift(1).ewm(span=5).mean())
 
-test_xg['home_xGF_roll'] = test_xg['home_xGF_roll'].clip(0.2, 4)
-test_xg['away_xGF_roll'] = test_xg['away_xGF_roll'].clip(0.2, 4)
+full_df["away_xGF_roll"] = full_df.groupby("away_team")["away_xGF"]\
+    .transform(lambda x: x.shift(1).ewm(span=5).mean())
+
+full_df["home_xGF_roll"] = full_df["home_xGF_roll"].fillna(1.2)
+full_df["away_xGF_roll"] = full_df["away_xGF_roll"].fillna(1.2)
+
+full_df['home_xGF_roll'] = full_df['home_xGF_roll'].clip(0.3, 3.5)
+full_df['away_xGF_roll'] = full_df['away_xGF_roll'].clip(0.3, 3.5)
+
+train_xg = full_df[full_df['date'].dt.year <= 2021]
+test_xg = full_df[full_df['date'].dt.year == 2022]
+
 
 # prepare unique teams
 teams = pd.concat([train_xg['home_team'], train_xg['away_team']]).unique()
