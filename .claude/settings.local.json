@@ -4,7 +4,9 @@
       "Bash(python dc_cat_v2.py)",
       "Bash(python3 -c ' *)",
       "Bash(python preprocessor_v2.py)",
-      "Bash(python dc_cat_v3.py)"
+      "Bash(python dc_cat_v3.py)",
+      "Bash(python make_notebooks.py)",
+      "Bash(Select-String -Pattern \"test_scenarios|ERR|Done\")"
     ]
   }
 }

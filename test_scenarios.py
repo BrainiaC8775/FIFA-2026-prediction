@@ -2,33 +2,42 @@
 test_scenarios.py — Pre-production model evaluation
 ====================================================
 
-Evaluates three training configurations on the international test set (2023-2024)
+Evaluates four configurations on the international test set (2023-2024)
 and compares them to decide on production readiness.
 
-  Scenario 1 (= Phase 1 replicate)
+  Phase 1  (loaded from saved models — no retrain)
       Train: train_intl_v2 (international only)
       Test:  test_intl_v2
-      Purpose: establish the intl-only baseline; confirms Phase 1 results
+      Purpose: recover prior Phase 1 results from saved models
 
-  Scenario 2  (NEW)
+  Scenario 1  (fresh retrain — confirms Phase 1 replication)
+      Train: train_intl_v2 (international only)
+      Test:  test_intl_v2
+      Purpose: fresh train on intl data; should match Phase 1 closely
+
+  Scenario 2  (fresh retrain — NEW)
       Train: train_intl_v2 + train_club_v2  (joint international + club)
       Test:  test_intl_v2
-      Purpose: test whether club data transfers knowledge to international prediction
+      Purpose: test whether club data transfers to international prediction
 
-  Phase 2 replicate
+  Phase 2  (loaded from saved models — no retrain)
       Train: sw_intl + train_intl_v2  (soccerway enrichment, deduped)
       Test:  test_intl_v2
-      Purpose: confirms Phase 2 results; more recent intl data via soccerway
+      Purpose: recover prior Phase 2 soccerway-enriched results
 
-All scenarios are evaluated on the same base test set.
+All four are evaluated on the same consistent base_test set.
 Results saved to test_scenario_results.csv.
 """
 
-import os, time
+import os, time, pickle
 import numpy as np
 import pandas as pd
+from catboost import CatBoostRegressor
 
-from dc_cat_v3 import add_form_features, run_pipeline, save_pipeline, SAVE_DIR
+from dc_cat_v3 import (
+    add_form_features, run_pipeline, save_pipeline, SAVE_DIR,
+    get_dc_log_lambdas, build_features, evaluate,
+)
 from preprocessor_v2 import dedup_datasets
 
 
@@ -63,34 +72,30 @@ print(f"  base_test  : {len(base_test):,} rows  (both teams seen in train_intl)"
 
 print("\nPre-computing form features …")
 
-# ── Scenario 1 / Phase 1 (intl only) ────────────────────────────────────────
+# ── Intl-only form  (used by P1 loaded, S1 fresh) ────────────────────────────
 train_s1, hist_s1 = add_form_features(
     train_intl.sort_values("date").reset_index(drop=True)
 )
+# test_s1 is seeded from intl-only history — reused for both P1 and S1
 test_s1, _ = add_form_features(
     base_test.sort_values("date").reset_index(drop=True), seed=hist_s1
 )
 
-# ── Scenario 2 (intl + club) ─────────────────────────────────────────────────
-# Form computed separately per domain so intl history stays pure, then
-# DataFrames are concatenated for joint DC + CatBoost training.
-# Test is seeded from intl-only history (correct: test set is national teams).
-train_intl_s2, intl_hist_s2 = add_form_features(
-    train_intl.sort_values("date").reset_index(drop=True)
-)
+# ── Intl+club form  (used by S2 fresh) ───────────────────────────────────────
+# Form computed separately per domain so intl history stays pure for seeding
+# test; DataFrames are concatenated for joint DC + CatBoost training.
 train_club_s2, _ = add_form_features(
     train_club.sort_values("date").reset_index(drop=True)
 )
 train_s2 = (
-    pd.concat([train_intl_s2, train_club_s2], ignore_index=True)
+    pd.concat([train_s1, train_club_s2], ignore_index=True)
     .sort_values("date")
     .reset_index(drop=True)
 )
-test_s2, _ = add_form_features(
-    base_test.sort_values("date").reset_index(drop=True), seed=intl_hist_s2
-)
+# Test seeded from intl-only history (correct: test set is national teams)
+test_s2 = test_s1.copy()
 
-# ── Phase 2 (intl + sw_intl, deduped) ───────────────────────────────────────
+# ── Phase 2 form  (intl + sw_intl, deduped) ──────────────────────────────────
 # sw_intl is priority source (has xG); train_intl fills historical gaps.
 combined_p2 = dedup_datasets(sw_intl, train_intl)
 combined_p2 = combined_p2.sort_values("date").reset_index(drop=True)
@@ -99,35 +104,77 @@ test_p2, _ = add_form_features(
     base_test.sort_values("date").reset_index(drop=True), seed=hist_p2
 )
 
-print(f"  S1 / Phase 1 train rows : {len(train_s1):,}")
-print(f"  S2 (intl+club) train    : {len(train_s2):,}")
-print(f"  Phase 2 (intl+SW) train : {len(train_p2):,}")
+print(f"  Intl-only  train rows  : {len(train_s1):,}")
+print(f"  Intl+club  train rows  : {len(train_s2):,}")
+print(f"  Phase 2 SW train rows  : {len(train_p2):,}")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# EXPERIMENT RUNNER
+# LOAD & EVALUATE SAVED MODELS  (no retrain)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def load_and_evaluate(tag, test_df, save_dir=SAVE_DIR):
+    """Load saved DC params + CatBoost models; evaluate on test_df."""
+    pkl_path  = f"{save_dir}/{tag}_dc_params.pkl"
+    home_path = f"{save_dir}/{tag}_home.cbm"
+    away_path = f"{save_dir}/{tag}_away.cbm"
+
+    missing = [p for p in [pkl_path, home_path, away_path] if not os.path.exists(p)]
+    if missing:
+        print(f"  [SKIP] {tag}: file(s) not found — {missing}")
+        return None
+
+    with open(pkl_path, "rb") as f:
+        saved = pickle.load(f)
+    dc_params   = saved["dc_params"]
+    team_to_idx = saved["team_to_idx"]
+
+    m_home = CatBoostRegressor()
+    m_away = CatBoostRegressor()
+    m_home.load_model(home_path)
+    m_away.load_model(away_path)
+
+    # Filter test to teams known at training time
+    known     = set(team_to_idx.keys())
+    test_filt = test_df[
+        test_df["home_team"].isin(known) & test_df["away_team"].isin(known)
+    ].reset_index(drop=True)
+    dropped = len(test_df) - len(test_filt)
+    if dropped:
+        print(f"  [info] {dropped} test rows dropped — teams unseen in saved '{tag}'")
+
+    log_lh, log_la = get_dc_log_lambdas(test_filt, dc_params, team_to_idx)
+    X_test = build_features(test_filt, log_lh, log_la)
+
+    lh = np.clip(m_home.predict(X_test), 0.05, 10)
+    la = np.clip(m_away.predict(X_test), 0.05, 10)
+
+    return evaluate(test_filt, lh, la), len(test_filt)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# FRESH-RETRAIN RUNNER
 # ─────────────────────────────────────────────────────────────────────────────
 
 def run_experiment(name, train_df, test_df, dc_maxiter=5000, tune=True,
                    cb_depth=5, cb_lr=0.05, save_tag=None):
-    print(f"\n{'='*68}")
+    print(f"\n{'='*70}")
     print(f"  {name}")
     print(f"  Train: {len(train_df):,}  |  Test (intl): {len(test_df):,}")
-    print(f"{'='*68}")
+    print(f"{'='*70}")
     t0 = time.time()
 
-    # Drop test rows whose teams are unseen in this training set
-    known = set(train_df["home_team"]).union(set(train_df["away_team"]))
+    known     = set(train_df["home_team"]).union(set(train_df["away_team"]))
     test_filt = test_df[
         test_df["home_team"].isin(known) & test_df["away_team"].isin(known)
     ].copy()
     dropped = len(test_df) - len(test_filt)
     if dropped:
-        print(f"  [info] {dropped} test rows dropped (teams unseen in this train)")
+        print(f"  [info] {dropped} test rows dropped — teams unseen in this train")
 
     metrics, m_home, m_away, dc_params, team_to_idx = run_pipeline(
         train_df, test_filt,
-        dc_maxiter=dc_maxiter, tune=tune, cb_depth=cb_depth, cb_lr=cb_lr
+        dc_maxiter=dc_maxiter, tune=tune, cb_depth=cb_depth, cb_lr=cb_lr,
     )
     elapsed = time.time() - t0
     print(f"  Elapsed: {elapsed/60:.1f} min")
@@ -139,76 +186,83 @@ def run_experiment(name, train_df, test_df, dc_maxiter=5000, tune=True,
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# RUN ALL SCENARIOS
+# RUN ALL EVALUATIONS
 # ─────────────────────────────────────────────────────────────────────────────
 
 results    = {}
 test_sizes = {}
 
-# Scenario 1 — International only (replicates Phase 1)
+# ── Phase 1 & Phase 2 — load saved models (fast) ─────────────────────────────
+print(f"\n{'='*70}")
+print("  Evaluating Phase 1 & Phase 2 from saved models (no retrain)")
+print(f"{'='*70}")
+
+result = load_and_evaluate("phase1_intl", test_s1)
+if result:
+    metrics, n = result
+    results["P1_intl_loaded"]    = metrics
+    test_sizes["P1_intl_loaded"] = n
+    print(f"  Phase 1 (loaded) : {metrics}")
+
+result = load_and_evaluate("phase2_intl", test_p2)
+if result:
+    metrics, n = result
+    results["P2_intl_loaded"]    = metrics
+    test_sizes["P2_intl_loaded"] = n
+    print(f"  Phase 2 (loaded) : {metrics}")
+
+# ── Scenario 1 — International only  (fresh retrain) ─────────────────────────
 metrics, n = run_experiment(
-    "Scenario 1 — International Only  [Phase 1 replicate]",
+    "Scenario 1 — International Only  [fresh retrain — confirms Phase 1]",
     train_s1, test_s1,
     dc_maxiter=5000, tune=True,
     save_tag="scenario1_intl_only",
 )
-results["S1_intl_only"] = metrics
+results["S1_intl_only"]    = metrics
 test_sizes["S1_intl_only"] = n
 
-# Scenario 2 — International + Club  (NEW)
+# ── Scenario 2 — International + Club  (fresh retrain, NEW) ──────────────────
 metrics, n = run_experiment(
-    "Scenario 2 — International + Club  [joint training, NEW]",
+    "Scenario 2 — International + Club  [fresh retrain — NEW]",
     train_s2, test_s2,
     dc_maxiter=5000, tune=True,
     save_tag="scenario2_intl_club",
 )
-results["S2_intl_club"] = metrics
+results["S2_intl_club"]    = metrics
 test_sizes["S2_intl_club"] = n
-
-# Phase 2 — International + Soccerway Intl  (replicates Phase 2)
-metrics, n = run_experiment(
-    "Phase 2 — International + SW Intl  [Phase 2 replicate]",
-    train_p2, test_p2,
-    dc_maxiter=5000, tune=True,
-    save_tag="phase2_intl_sw_replicate",
-)
-results["P2_intl_sw"] = metrics
-test_sizes["P2_intl_sw"] = n
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # COMPARISON TABLE
 # ─────────────────────────────────────────────────────────────────────────────
 
+# Ordered columns: Phase1 → S1 → S2 → Phase2
+COL_ORDER = ["P1_intl_loaded", "S1_intl_only", "S2_intl_club", "P2_intl_loaded"]
 LABELS = {
-    "S1_intl_only": "S1: Intl Only (P1)",
-    "S2_intl_club": "S2: Intl+Club (NEW)",
-    "P2_intl_sw":   "P2: Intl+SW",
+    "P1_intl_loaded": "P1: Intl (saved)",
+    "S1_intl_only":   "S1: Intl (fresh)",
+    "S2_intl_club":   "S2: Intl+Club",
+    "P2_intl_loaded": "P2: Intl+SW (saved)",
 }
 TRAIN_SIZES = {
-    "S1_intl_only": len(train_s1),
-    "S2_intl_club": len(train_s2),
-    "P2_intl_sw":   len(train_p2),
+    "P1_intl_loaded": len(train_s1),
+    "S1_intl_only":   len(train_s1),
+    "S2_intl_club":   len(train_s2),
+    "P2_intl_loaded": len(train_p2),
 }
 
-# Historical baselines from code comments (v2, intl, 2022 test window)
-V2_BASELINES = {
-    "DC Only (v2 ref)":  {"log_loss": 0.9096, "rps": 0.1812, "accuracy": 0.5996, "exact_score_pct": "—"},
-    "DC+Elo (v2 ref)":   {"log_loss": 0.9166, "rps": 0.1820, "accuracy": 0.5975, "exact_score_pct": "—"},
-}
-
+keys  = [k for k in COL_ORDER if k in results]
 COL_W = 22
 
-print("\n\n" + "=" * 80)
-print(f"{'PRE-PRODUCTION EVALUATION  —  test_intl 2023-2024':^80}")
-print("=" * 80)
+print("\n\n" + "=" * 90)
+print(f"{'PRE-PRODUCTION EVALUATION  —  test_intl 2023-2024':^90}")
+print("=" * 90)
 
-keys = list(results.keys())
 print(f"{'Metric':<{COL_W}}", end="")
 for k in keys:
     print(f"{LABELS[k]:>{COL_W}}", end="")
 print()
-print("-" * 80)
+print("-" * 90)
 
 for metric in ["log_loss", "rps", "accuracy", "exact_score_pct"]:
     vals = [results[k][metric] for k in keys]
@@ -219,7 +273,7 @@ for metric in ["log_loss", "rps", "accuracy", "exact_score_pct"]:
         print(f"{v:>{COL_W - 2}.6f}{flag}", end="")
     print()
 
-print("-" * 80)
+print("-" * 90)
 print(f"  {'Train rows':<{COL_W - 2}}", end="")
 for k in keys:
     print(f"{TRAIN_SIZES[k]:>{COL_W},}", end="")
@@ -228,86 +282,94 @@ print(f"  {'Test rows':<{COL_W - 2}}", end="")
 for k in keys:
     print(f"{test_sizes[k]:>{COL_W},}", end="")
 print()
-print("=" * 80)
-
-print("\nv2 Baselines (intl, 2022 test window — earlier experiment):")
-for name, b in V2_BASELINES.items():
-    print(f"  {name:<22}  log_loss={b['log_loss']}  rps={b['rps']}  "
-          f"accuracy={b['accuracy']}  exact_score={b['exact_score_pct']}")
-
+print("=" * 90)
 print("\n  ◄ = best value in row")
 print("  Interpretation: log_loss / rps ↓ better  |  accuracy / exact_score ↑ better")
+print("  P1/P2 = loaded from saved models (no retrain)")
+print("  S1/S2 = fresh retrain")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# TRANSFER LEARNING ANALYSIS
+# ANALYSIS
 # ─────────────────────────────────────────────────────────────────────────────
-
-s1 = results["S1_intl_only"]
-s2 = results["S2_intl_club"]
-p2 = results["P2_intl_sw"]
-
-print("\n" + "─" * 80)
-print("TRANSFER LEARNING ANALYSIS")
-print("─" * 80)
 
 def delta(a, b, metric):
     """Signed improvement of b over a (positive = b is better)."""
     v_a, v_b = a[metric], b[metric]
     if metric in ("log_loss", "rps"):
-        return v_a - v_b   # lower is better → positive delta means improvement
+        return v_a - v_b   # lower is better
     else:
         return v_b - v_a   # higher is better
 
-print(f"\n  S2 vs S1 — does club data help international prediction?")
-for m in ["log_loss", "rps", "accuracy", "exact_score_pct"]:
-    d = delta(s1, s2, m)
-    sign = "+" if d > 0 else ""
-    tag  = "IMPROVES" if d > 0 else "HURTS   " if d < 0 else "NO CHANGE"
-    print(f"    {m:<22}  S1={s1[m]:.6f}  S2={s2[m]:.6f}  Δ={sign}{d:.6f}  [{tag}]")
+p1 = results.get("P1_intl_loaded", {})
+s1 = results.get("S1_intl_only",   {})
+s2 = results.get("S2_intl_club",   {})
+p2 = results.get("P2_intl_loaded", {})
 
-print(f"\n  P2 vs S1 — does recent soccerway intl data help?")
-for m in ["log_loss", "rps", "accuracy", "exact_score_pct"]:
-    d = delta(s1, p2, m)
-    sign = "+" if d > 0 else ""
-    tag  = "IMPROVES" if d > 0 else "HURTS   " if d < 0 else "NO CHANGE"
-    print(f"    {m:<22}  S1={s1[m]:.6f}  P2={p2[m]:.6f}  Δ={sign}{d:.6f}  [{tag}]")
+print("\n" + "─" * 90)
+print("ANALYSIS")
+print("─" * 90)
 
-print(f"\n  P2 vs S2 — soccerway intl vs club data augmentation?")
-for m in ["log_loss", "rps", "accuracy", "exact_score_pct"]:
-    d = delta(s2, p2, m)
-    sign = "+" if d > 0 else ""
-    tag  = "P2 better " if d > 0 else "S2 better " if d < 0 else "TIED     "
-    print(f"    {m:<22}  S2={s2[m]:.6f}  P2={p2[m]:.6f}  Δ={sign}{d:.6f}  [{tag}]")
+if p1 and s1:
+    print("\n  S1 vs P1 — replication check (fresh retrain vs saved Phase 1):")
+    print("  (close = pipeline is stable; large gap = randomness / data version drift)")
+    for m in ["log_loss", "rps", "accuracy", "exact_score_pct"]:
+        d = delta(p1, s1, m)
+        sign = "+" if d > 0 else ""
+        tag  = "S1 better" if d > 0 else "P1 better" if d < 0 else "IDENTICAL"
+        print(f"    {m:<22}  P1={p1[m]:.6f}  S1={s1[m]:.6f}  Δ={sign}{d:.6f}  [{tag}]")
+
+if s1 and s2:
+    print("\n  S2 vs S1 — does club data transfer to international prediction?")
+    for m in ["log_loss", "rps", "accuracy", "exact_score_pct"]:
+        d = delta(s1, s2, m)
+        sign = "+" if d > 0 else ""
+        tag  = "IMPROVES" if d > 0 else "HURTS   " if d < 0 else "NO CHANGE"
+        print(f"    {m:<22}  S1={s1[m]:.6f}  S2={s2[m]:.6f}  Δ={sign}{d:.6f}  [{tag}]")
+
+if s1 and p2:
+    print("\n  P2 vs S1 — does soccerway enrichment beat intl-only?")
+    for m in ["log_loss", "rps", "accuracy", "exact_score_pct"]:
+        d = delta(s1, p2, m)
+        sign = "+" if d > 0 else ""
+        tag  = "IMPROVES" if d > 0 else "HURTS   " if d < 0 else "NO CHANGE"
+        print(f"    {m:<22}  S1={s1[m]:.6f}  P2={p2[m]:.6f}  Δ={sign}{d:.6f}  [{tag}]")
+
+if s2 and p2:
+    print("\n  S2 vs P2 — club augmentation vs soccerway enrichment?")
+    for m in ["log_loss", "rps", "accuracy", "exact_score_pct"]:
+        d = delta(p2, s2, m)
+        sign = "+" if d > 0 else ""
+        tag  = "S2 better" if d > 0 else "P2 better" if d < 0 else "TIED     "
+        print(f"    {m:<22}  P2={p2[m]:.6f}  S2={s2[m]:.6f}  Δ={sign}{d:.6f}  [{tag}]")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PRODUCTION READINESS VERDICT
 # ─────────────────────────────────────────────────────────────────────────────
 
-# Pick the best model by RPS (primary metric — measures calibration)
-best_key    = min(results, key=lambda k: results[k]["rps"])
-best_label  = LABELS[best_key]
-best        = results[best_key]
-
-# Thresholds based on v2 DC-only baseline and football prediction literature
+# Primary metric: RPS (lower = better probability calibration)
+# Thresholds derived from v2 DC-only baseline and football prediction literature
 THRESH = {
-    "rps":             0.195,   # v2 DC-only = 0.1812; v3 should be ≤ this
-    "log_loss":        0.98,    # upper bound for calibrated intl football model
-    "accuracy":        0.48,    # above coin-flip (~33% uniform random)
+    "rps":      0.195,   # v2 DC-only = 0.1812; set generous upper bound
+    "log_loss": 0.98,    # upper bound for calibrated intl football model
+    "accuracy": 0.48,    # well above coin-flip (~33% for 3-way outcome)
 }
+
+best_key   = min(results, key=lambda k: results[k]["rps"])
+best_label = LABELS.get(best_key, best_key)
+best       = results[best_key]
 
 checks = {
     "rps":      (best["rps"]      <= THRESH["rps"],      best["rps"],      THRESH["rps"],      "≤"),
     "log_loss": (best["log_loss"] <= THRESH["log_loss"],  best["log_loss"], THRESH["log_loss"], "≤"),
     "accuracy": (best["accuracy"] >= THRESH["accuracy"],  best["accuracy"], THRESH["accuracy"], "≥"),
 }
-
 all_pass = all(v[0] for v in checks.values())
 
-print("\n" + "=" * 80)
+print("\n" + "=" * 90)
 print("PRODUCTION READINESS VERDICT")
-print("=" * 80)
+print("=" * 90)
 print(f"\n  Best model : {best_label}")
 print(f"  Metrics    : rps={best['rps']:.6f}  log_loss={best['log_loss']:.6f}  "
       f"accuracy={best['accuracy']:.6f}  exact_score={best['exact_score_pct']:.6f}")
@@ -319,19 +381,21 @@ for metric, (passed, val, thresh, op) in checks.items():
 print()
 if all_pass:
     print("  ✓  PRODUCTION READY")
-    print(f"     Recommended model: {best_label}")
-    print(f"     Model artifacts  : {SAVE_DIR}/{best_key.lower()}_{{home,away}}.cbm")
+    print(f"     Recommended model : {best_label}")
+    print(f"     Model artifacts   : {SAVE_DIR}/{best_key.lower()}_{{home,away}}.cbm")
 else:
     print("  ✗  NOT READY — one or more threshold checks failed")
     print("     Review the FAIL rows above before promoting to production.")
 
 print()
-print("  Guidance:")
-print("   • RPS is the primary calibration metric (lower = better probability estimates)")
-print("   • If S2 RPS < S1 RPS → club data improves intl prediction → use Scenario 2")
-print("   • If P2 RPS < S1 RPS → soccerway enrichment helps → use Phase 2 pipeline")
-print("   • Run model_comparison.py for a fuller 4-way experiment (Exp A/B/C/D)")
-print("=" * 80)
+print("  Decision guide:")
+print("   • RPS is the primary metric (lower = better-calibrated probabilities)")
+print("   • S1 ≈ P1       → pipeline is stable, replication confirmed")
+print("   • S2 RPS < S1   → use Scenario 2 (intl+club) as production config")
+print("   • P2 RPS < S1   → use Phase 2 soccerway pipeline for production")
+print("   • All passing   → promote best model artifacts to production")
+print("   • Any FAIL      → investigate before promoting")
+print("=" * 90)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -339,10 +403,12 @@ print("=" * 80)
 # ─────────────────────────────────────────────────────────────────────────────
 
 rows = []
-for k, m in results.items():
+for k in keys:
+    m   = results[k]
     row = {
-        "experiment":  LABELS[k],
-        "train_rows":  TRAIN_SIZES[k],
+        "experiment":  LABELS.get(k, k),
+        "mode":        "loaded" if "loaded" in k else "fresh_retrain",
+        "train_rows":  TRAIN_SIZES.get(k),
         "test_rows":   test_sizes[k],
         "is_best":     (k == best_key),
     }
