@@ -1,29 +1,10 @@
+import os, pickle
 import numpy as np
 import pandas as pd
 from catboost import CatBoostRegressor
 from scipy.special import gammaln
 from scipy.optimize import minimize
 from sklearn.model_selection import train_test_split
-
-# ─────────────────────────────────────────────────────────────
-# DATA LOADING  (v2 CSVs produced by preprocessor_v2.py)
-# ─────────────────────────────────────────────────────────────
-train_club = pd.read_csv('train_club_v2.csv')
-test_club  = pd.read_csv('test_club_v2.csv')
-train_intl = pd.read_csv('train_intl_v2.csv')
-test_intl  = pd.read_csv('test_intl_v2.csv')
-
-train_teams_c = set(train_club['home_team']).union(set(train_club['away_team']))
-test_club = test_club[
-    test_club['home_team'].isin(train_teams_c) &
-    test_club['away_team'].isin(train_teams_c)
-]
-
-train_teams_i = set(train_intl['home_team']).union(set(train_intl['away_team']))
-test_intl = test_intl[
-    test_intl['home_team'].isin(train_teams_i) &
-    test_intl['away_team'].isin(train_teams_i)
-]
 
 # ─────────────────────────────────────────────────────────────
 # FORM FEATURES  (v3: extends history tuple with xG)
@@ -163,10 +144,6 @@ def build_form_features(train_df, test_df, window=5):
     train_df, train_hist = add_form_features(train_df, window=window)
     test_df,  _          = add_form_features(test_df,  window=window, seed=train_hist)
     return train_df, test_df
-
-
-train_intl, test_intl = build_form_features(train_intl, test_intl)
-train_club, test_club = build_form_features(train_club, test_club)
 
 
 # ─────────────────────────────────────────────────────────────
@@ -513,105 +490,123 @@ def run_pipeline(train_df, test_df, decay_lambda=0.0005, reg=0.0001,
 
 
 # ─────────────────────────────────────────────────────────────
-# MAIN
+# SAVE HELPER  (module-level so test_scenarios.py can import it)
 # ─────────────────────────────────────────────────────────────
-import os, pickle
-
 SAVE_DIR = "models_dc_cat_v3"
-os.makedirs(SAVE_DIR, exist_ok=True)
 
-def save_pipeline(tag, m_home, m_away, dc_params, team_to_idx):
-    m_home.save_model(f"{SAVE_DIR}/{tag}_home.cbm")
-    m_away.save_model(f"{SAVE_DIR}/{tag}_away.cbm")
-    with open(f"{SAVE_DIR}/{tag}_dc_params.pkl", "wb") as f:
+def save_pipeline(tag, m_home, m_away, dc_params, team_to_idx, save_dir=None):
+    d = save_dir or SAVE_DIR
+    os.makedirs(d, exist_ok=True)
+    m_home.save_model(f"{d}/{tag}_home.cbm")
+    m_away.save_model(f"{d}/{tag}_away.cbm")
+    with open(f"{d}/{tag}_dc_params.pkl", "wb") as f:
         pickle.dump({"dc_params": dc_params, "team_to_idx": team_to_idx}, f)
-    print(f"  Saved → {SAVE_DIR}/{tag}_{{home,away}}.cbm + {tag}_dc_params.pkl")
+    print(f"  Saved → {d}/{tag}_{{home,away}}.cbm + {tag}_dc_params.pkl")
 
-all_results = {}
 
-# ── Phase 1: International ────────────────────────────────────
-print("=== DC + CatBoost Poisson v3 — Phase 1: International ===\n")
-metrics, m_home, m_away, dc_params, team_to_idx = run_pipeline(
-    train_intl, test_intl, dc_maxiter=5000
-)
-all_results["intl"] = metrics
-save_pipeline("phase1_intl", m_home, m_away, dc_params, team_to_idx)
-
-# ── Phase 1: Club ─────────────────────────────────────────────
-print("\n=== DC + CatBoost Poisson v3 — Phase 1: Club ===\n")
-metrics, m_home, m_away, dc_params, team_to_idx = run_pipeline(
-    train_club, test_club, dc_maxiter=500, tune=False, cb_depth=5, cb_lr=0.05
-)
-all_results["club"] = metrics
-save_pipeline("phase1_club", m_home, m_away, dc_params, team_to_idx)
-
-# ── Summary ───────────────────────────────────────────────────
-print("\n" + "="*60)
-print(f"{'Metric':<22} {'Intl':>12} {'Club':>12}")
-print("-"*60)
-for k in all_results["intl"]:
-    print(f"  {k:<20} {all_results['intl'][k]:>12} {all_results['club'][k]:>12}")
-print("="*60)
-
-# v2 reference (intl, 2022 test window):
-#   DC_only  → log_loss=0.9096, rps=0.1812, accuracy=0.5996
-#   DC_Elo   → log_loss=0.9166, rps=0.1820, accuracy=0.5975
-#   DC_Cat_v2 (intl) → see models_dc_cat_v2/ for baseline
-
-# ─────────────────────────────────────────────────────────────
-# PHASE 2: Soccerway enrichment (run after preprocessor_v2.py
-# has produced sw_club.csv and sw_intl.csv)
-# ─────────────────────────────────────────────────────────────
-
-import os as _os
-if _os.path.exists("sw_intl.csv") and _os.path.exists("sw_club.csv"):
+if __name__ == "__main__":
     from preprocessor_v2 import dedup_datasets
 
-    print("\n=== Phase 2: Soccerway Enrichment ===\n")
+    # ── Data loading ──────────────────────────────────────────────
+    train_club = pd.read_csv('train_club_v2.csv')
+    test_club  = pd.read_csv('test_club_v2.csv')
+    train_intl = pd.read_csv('train_intl_v2.csv')
+    test_intl  = pd.read_csv('test_intl_v2.csv')
 
-    sw_club = pd.read_csv("sw_club.csv")
-    sw_intl = pd.read_csv("sw_intl.csv")
+    train_teams_c = set(train_club['home_team']).union(set(train_club['away_team']))
+    test_club = test_club[
+        test_club['home_team'].isin(train_teams_c) &
+        test_club['away_team'].isin(train_teams_c)
+    ]
 
-    # ── Combine and re-run form features from scratch ────────────
-    # Soccerway is the priority source (has xG); intl_stats is fallback
-    combined_intl = dedup_datasets(sw_intl, train_intl)   # sw first = priority
-    combined_club = dedup_datasets(sw_club, train_club)
+    train_teams_i = set(train_intl['home_team']).union(set(train_intl['away_team']))
+    test_intl = test_intl[
+        test_intl['home_team'].isin(train_teams_i) &
+        test_intl['away_team'].isin(train_teams_i)
+    ]
 
-    # Sort and compute form on the full combined corpus, seeding test from the end
-    combined_intl = combined_intl.sort_values('date').reset_index(drop=True)
-    combined_club = combined_club.sort_values('date').reset_index(drop=True)
+    # ── Form features ─────────────────────────────────────────────
+    train_intl, test_intl = build_form_features(train_intl, test_intl)
+    train_club, test_club = build_form_features(train_club, test_club)
 
-    combined_intl_form, intl_hist = add_form_features(combined_intl)
-    combined_club_form, club_hist = add_form_features(combined_club)
+    all_results = {}
 
-    # Test form seeded from combined training history (no leakage)
-    test_intl_p2, _ = add_form_features(test_intl, seed=intl_hist)
-    test_club_p2,  _ = add_form_features(test_club,  seed=club_hist)
-
-    print("=== Phase 2: International ===\n")
-    metrics_p2, mh2, ma2, dcp2, t2i2 = run_pipeline(
-        combined_intl_form, test_intl_p2, dc_maxiter=5000
+    # ── Phase 1: International ────────────────────────────────────
+    print("=== DC + CatBoost Poisson v3 — Phase 1: International ===\n")
+    metrics, m_home, m_away, dc_params, team_to_idx = run_pipeline(
+        train_intl, test_intl, dc_maxiter=5000
     )
-    all_results["intl_p2"] = metrics_p2
-    save_pipeline("phase2_intl", mh2, ma2, dcp2, t2i2)
+    all_results["intl"] = metrics
+    save_pipeline("phase1_intl", m_home, m_away, dc_params, team_to_idx)
 
-    print("\n=== Phase 2: Club ===\n")
-    metrics_p2c, mh2c, ma2c, dcp2c, t2i2c = run_pipeline(
-        combined_club_form, test_club_p2, dc_maxiter=500, tune=False, cb_depth=5, cb_lr=0.05
+    # ── Phase 1: Club ─────────────────────────────────────────────
+    print("\n=== DC + CatBoost Poisson v3 — Phase 1: Club ===\n")
+    metrics, m_home, m_away, dc_params, team_to_idx = run_pipeline(
+        train_club, test_club, dc_maxiter=500, tune=False, cb_depth=5, cb_lr=0.05
     )
-    all_results["club_p2"] = metrics_p2c
-    save_pipeline("phase2_club", mh2c, ma2c, dcp2c, t2i2c)
+    all_results["club"] = metrics
+    save_pipeline("phase1_club", m_home, m_away, dc_params, team_to_idx)
 
-    print("\n" + "="*70)
-    print(f"{'Metric':<22} {'Intl P1':>10} {'Intl P2':>10} {'Club P1':>10} {'Club P2':>10}")
-    print("-"*70)
+    # ── Summary ───────────────────────────────────────────────────
+    print("\n" + "="*60)
+    print(f"{'Metric':<22} {'Intl':>12} {'Club':>12}")
+    print("-"*60)
     for k in all_results["intl"]:
-        p1i = all_results['intl'].get(k, '-')
-        p2i = all_results.get('intl_p2', {}).get(k, '-')
-        p1c = all_results['club'].get(k, '-')
-        p2c = all_results.get('club_p2', {}).get(k, '-')
-        print(f"  {k:<20} {p1i:>10} {p2i:>10} {p1c:>10} {p2c:>10}")
-    print("="*70)
-else:
-    print("\n[Phase 2 skipped — sw_intl.csv / sw_club.csv not found]")
-    print("Run preprocessor_v2.py first, then re-run dc_cat_v3.py for Phase 2.")
+        print(f"  {k:<20} {all_results['intl'][k]:>12} {all_results['club'][k]:>12}")
+    print("="*60)
+
+    # v2 reference (intl, 2022 test window):
+    #   DC_only  → log_loss=0.9096, rps=0.1812, accuracy=0.5996
+    #   DC_Elo   → log_loss=0.9166, rps=0.1820, accuracy=0.5975
+    #   DC_Cat_v2 (intl) → see models_dc_cat_v2/ for baseline
+
+    # ─────────────────────────────────────────────────────────────
+    # PHASE 2: Soccerway enrichment
+    # ─────────────────────────────────────────────────────────────
+    if os.path.exists("sw_intl.csv") and os.path.exists("sw_club.csv"):
+        print("\n=== Phase 2: Soccerway Enrichment ===\n")
+
+        sw_club = pd.read_csv("sw_club.csv")
+        sw_intl = pd.read_csv("sw_intl.csv")
+
+        # Soccerway is priority (has xG); intl_stats is fallback
+        combined_intl = dedup_datasets(sw_intl, train_intl)
+        combined_club = dedup_datasets(sw_club, train_club)
+
+        combined_intl = combined_intl.sort_values('date').reset_index(drop=True)
+        combined_club = combined_club.sort_values('date').reset_index(drop=True)
+
+        combined_intl_form, intl_hist = add_form_features(combined_intl)
+        combined_club_form, club_hist = add_form_features(combined_club)
+
+        # Test form seeded from combined training history (no leakage)
+        test_intl_p2, _ = add_form_features(test_intl, seed=intl_hist)
+        test_club_p2,  _ = add_form_features(test_club,  seed=club_hist)
+
+        print("=== Phase 2: International ===\n")
+        metrics_p2, mh2, ma2, dcp2, t2i2 = run_pipeline(
+            combined_intl_form, test_intl_p2, dc_maxiter=5000
+        )
+        all_results["intl_p2"] = metrics_p2
+        save_pipeline("phase2_intl", mh2, ma2, dcp2, t2i2)
+
+        print("\n=== Phase 2: Club ===\n")
+        metrics_p2c, mh2c, ma2c, dcp2c, t2i2c = run_pipeline(
+            combined_club_form, test_club_p2, dc_maxiter=500, tune=False, cb_depth=5, cb_lr=0.05
+        )
+        all_results["club_p2"] = metrics_p2c
+        save_pipeline("phase2_club", mh2c, ma2c, dcp2c, t2i2c)
+
+        print("\n" + "="*70)
+        print(f"{'Metric':<22} {'Intl P1':>10} {'Intl P2':>10} {'Club P1':>10} {'Club P2':>10}")
+        print("-"*70)
+        for k in all_results["intl"]:
+            p1i = all_results['intl'].get(k, '-')
+            p2i = all_results.get('intl_p2', {}).get(k, '-')
+            p1c = all_results['club'].get(k, '-')
+            p2c = all_results.get('club_p2', {}).get(k, '-')
+            print(f"  {k:<20} {p1i:>10} {p2i:>10} {p1c:>10} {p2c:>10}")
+        print("="*70)
+    else:
+        print("\n[Phase 2 skipped — sw_intl.csv / sw_club.csv not found]")
+        print("Run preprocessor_v2.py first, then re-run dc_cat_v3.py for Phase 2.")
