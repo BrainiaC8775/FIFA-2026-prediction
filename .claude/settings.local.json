@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python dc_cat_v2.py)",
+      "Bash(python3 -c ' *)",
+      "Bash(python preprocessor_v2.py)",
+      "Bash(python dc_cat_v3.py)"
+    ]
+  }
+}
