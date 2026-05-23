@@ -163,9 +163,13 @@ def make_notebook(py_path: str) -> str:
 
     # ── Content sections ──────────────────────────────────────────
     for header, code in sections:
-        # Skip if this block is just the module docstring (already shown)
+        # If this block starts with the module docstring, strip it out but
+        # keep any imports / code that follow it in the same block.
         if docstring and code.lstrip().startswith('"""') and docstring[:40] in code:
-            continue
+            after = re.sub(r'""".*?"""', '', code, count=1, flags=re.DOTALL).strip()
+            if not after:
+                continue          # block was purely the docstring — skip entirely
+            code = after          # keep only the non-docstring code (imports etc.)
         if header:
             cells.append(md_cell(f"## {header}"))
         cells.append(code_cell(code))

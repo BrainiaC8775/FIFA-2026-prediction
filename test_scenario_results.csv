@@ -1,0 +1,8 @@
+experiment,mode,train_rows,test_rows,is_best,log_loss,rps,accuracy,exact_score_pct
+P1: Intl (saved),loaded,24414,1334,False,0.815709,0.149727,0.635682,0.132684
+S1: Intl (no decay),fresh_retrain,24414,1334,False,0.813254,0.149178,0.633433,0.143928
+P2: Intl+SW (saved),loaded,25567,1334,False,0.810981,0.14873,0.634183,0.137931
+S4: Ens P2+P1,fresh_retrain,24414,1332,False,0.811889,0.148917,0.636637,0.13964
+S5: Mild decay,fresh_retrain,24414,1334,False,0.814213,0.149423,0.637181,0.143178
+S6: Ens P2+S5,fresh_retrain,24414,1332,False,0.810699,0.14866,0.635886,0.138889
+S3: Ens P2+S1,fresh_retrain,24414,1332,True,0.810608,0.148657,0.635135,0.138889

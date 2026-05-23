@@ -33,6 +33,10 @@ import os, time, pickle
 import numpy as np
 import pandas as pd
 from catboost import CatBoostRegressor
+from scipy.special import gammaln
+from scipy.optimize import minimize
+from sklearn.model_selection import train_test_split
+from scipy.stats import poisson
 
 from dc_cat_v3 import (
     add_form_features, run_pipeline, save_pipeline, SAVE_DIR,
@@ -113,7 +117,27 @@ print(f"  Phase 2 SW train rows  : {len(train_p2):,}")
 # LOAD & EVALUATE SAVED MODELS  (no retrain)
 # ─────────────────────────────────────────────────────────────────────────────
 
-def load_and_evaluate(tag, test_df, save_dir=SAVE_DIR):
+def _match_key(df):
+    """Stable match identifier for cross-model alignment."""
+    return (df['date'].astype(str) + '|' + df['home_team'] + '|' + df['away_team']).values
+
+def align_lambdas(df1, lh1, la1, df2, lh2, la2):
+    """Average lambda predictions from two models aligned by match key.
+    Returns (common_df, ens_lh, ens_la) where common_df rows come from df1."""
+    k1 = _match_key(df1)
+    k2 = _match_key(df2)
+    map1 = {k: i for i, k in enumerate(k1)}
+    map2 = {k: i for i, k in enumerate(k2)}
+    common = [k for k in map1 if k in map2]
+    idx1 = np.array([map1[k] for k in common])
+    idx2 = np.array([map2[k] for k in common])
+    ens_lh = (lh1[idx1] + lh2[idx2]) / 2
+    ens_la = (la1[idx1] + la2[idx2]) / 2
+    ens_df = df1.iloc[idx1].reset_index(drop=True)
+    return ens_df, ens_lh, ens_la
+
+
+def load_and_evaluate(tag, test_df, save_dir=SAVE_DIR, return_lambdas=False):
     """Load saved DC params + CatBoost models; evaluate on test_df."""
     pkl_path  = f"{save_dir}/{tag}_dc_params.pkl"
     home_path = f"{save_dir}/{tag}_home.cbm"
@@ -149,7 +173,10 @@ def load_and_evaluate(tag, test_df, save_dir=SAVE_DIR):
     lh = np.clip(m_home.predict(X_test), 0.05, 10)
     la = np.clip(m_away.predict(X_test), 0.05, 10)
 
-    return evaluate(test_filt, lh, la), len(test_filt)
+    metrics = evaluate(test_filt, lh, la)
+    if return_lambdas:
+        return metrics, len(test_filt), lh, la, test_filt
+    return metrics, len(test_filt)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -157,7 +184,7 @@ def load_and_evaluate(tag, test_df, save_dir=SAVE_DIR):
 # ─────────────────────────────────────────────────────────────────────────────
 
 def run_experiment(name, train_df, test_df, dc_maxiter=5000, tune=True,
-                   cb_depth=5, cb_lr=0.05, save_tag=None):
+                   cb_depth=5, cb_lr=0.05, save_tag=None, cb_decay_lambda=0.0):
     print(f"\n{'='*70}")
     print(f"  {name}")
     print(f"  Train: {len(train_df):,}  |  Test (intl): {len(test_df):,}")
@@ -172,9 +199,10 @@ def run_experiment(name, train_df, test_df, dc_maxiter=5000, tune=True,
     if dropped:
         print(f"  [info] {dropped} test rows dropped — teams unseen in this train")
 
-    metrics, m_home, m_away, dc_params, team_to_idx = run_pipeline(
+    metrics, m_home, m_away, dc_params, team_to_idx, lh_test, la_test = run_pipeline(
         train_df, test_filt,
         dc_maxiter=dc_maxiter, tune=tune, cb_depth=cb_depth, cb_lr=cb_lr,
+        cb_decay_lambda=cb_decay_lambda,
     )
     elapsed = time.time() - t0
     print(f"  Elapsed: {elapsed/60:.1f} min")
@@ -182,7 +210,7 @@ def run_experiment(name, train_df, test_df, dc_maxiter=5000, tune=True,
     if save_tag:
         save_pipeline(save_tag, m_home, m_away, dc_params, team_to_idx)
 
-    return metrics, len(test_filt)
+    return metrics, len(test_filt), lh_test, la_test, test_filt
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -197,23 +225,25 @@ print(f"\n{'='*70}")
 print("  Evaluating Phase 1 & Phase 2 from saved models (no retrain)")
 print(f"{'='*70}")
 
-result = load_and_evaluate("phase1_intl", test_s1)
+p1_lh = p1_la = p1_test_filt = None
+result = load_and_evaluate("phase1_intl", test_s1, return_lambdas=True)
 if result:
-    metrics, n = result
+    metrics, n, p1_lh, p1_la, p1_test_filt = result
     results["P1_intl_loaded"]    = metrics
     test_sizes["P1_intl_loaded"] = n
     print(f"  Phase 1 (loaded) : {metrics}")
 
-result = load_and_evaluate("phase2_intl", test_p2)
+p2_lh = p2_la = p2_test_filt = None
+result = load_and_evaluate("phase2_intl", test_p2, return_lambdas=True)
 if result:
-    metrics, n = result
+    metrics, n, p2_lh, p2_la, p2_test_filt = result
     results["P2_intl_loaded"]    = metrics
     test_sizes["P2_intl_loaded"] = n
     print(f"  Phase 2 (loaded) : {metrics}")
 
-# ── Scenario 1 — International only  (fresh retrain) ─────────────────────────
-metrics, n = run_experiment(
-    "Scenario 1 — International Only  [fresh retrain — confirms Phase 1]",
+# ── Scenario 1 — International only  (fresh retrain, no CB decay — replication check) ─
+metrics, n, s1_lh, s1_la, s1_test_filt = run_experiment(
+    "Scenario 1 — International Only  [fresh retrain, no CB decay]",
     train_s1, test_s1,
     dc_maxiter=5000, tune=True,
     save_tag="scenario1_intl_only",
@@ -221,15 +251,71 @@ metrics, n = run_experiment(
 results["S1_intl_only"]    = metrics
 test_sizes["S1_intl_only"] = n
 
-# ── Scenario 2 — International + Club  (fresh retrain, NEW) ──────────────────
-metrics, n = run_experiment(
-    "Scenario 2 — International + Club  [fresh retrain — NEW]",
-    train_s2, test_s2,
+# ── Scenario 5 — International only, mild CB decay (λ=0.00005) ───────────────
+metrics, n, s5_lh, s5_la, s5_test_filt = run_experiment(
+    "Scenario 5 — International Only  [mild CB decay λ=0.00005]",
+    train_s1, test_s1,
     dc_maxiter=5000, tune=True,
-    save_tag="scenario2_intl_club",
+    save_tag="scenario5_mild_decay",
+    cb_decay_lambda=0.00005,
 )
-results["S2_intl_club"]    = metrics
-test_sizes["S2_intl_club"] = n
+results["S5_mild_decay"]    = metrics
+test_sizes["S5_mild_decay"] = n
+
+# ── Scenario 2 — SKIPPED (club data consistently hurts; saves ~7 min) ────────
+# metrics, n, _, _, _ = run_experiment(
+#     "Scenario 2 — International + Club  [fresh retrain — NEW]",
+#     train_s2, test_s2,
+#     dc_maxiter=5000, tune=True,
+#     save_tag="scenario2_intl_club",
+# )
+# results["S2_intl_club"]    = metrics
+# test_sizes["S2_intl_club"] = n
+
+# ── Scenario 4 — Ensemble: P2 (loaded) + P1 (loaded) — zero retrain cost ─────
+if p2_lh is not None and p1_lh is not None:
+    print(f"\n{'='*70}")
+    print("  Scenario 4 — Ensemble: P2 (Intl+SW) ⊕ P1 (Intl) — both loaded")
+    print(f"{'='*70}")
+    ens_df, ens_lh, ens_la = align_lambdas(
+        p1_test_filt, p1_lh, p1_la,
+        p2_test_filt, p2_lh, p2_la,
+    )
+    ens_metrics = evaluate(ens_df, ens_lh, ens_la)
+    results["S4_ensemble_p2p1"]    = ens_metrics
+    test_sizes["S4_ensemble_p2p1"] = len(ens_df)
+    print(f"  Aligned rows : {len(ens_df):,}  (P2 ∩ P1 by match key)")
+    print(f"  Metrics      : {ens_metrics}")
+
+# ── Scenario 6 — Ensemble: P2 (loaded) + S5 (mild decay retrain) ────────────
+if p2_lh is not None and s5_lh is not None:
+    print(f"\n{'='*70}")
+    print("  Scenario 6 — Ensemble: P2 (Intl+SW loaded) ⊕ S5 (mild CB decay)")
+    print(f"{'='*70}")
+    ens_df, ens_lh, ens_la = align_lambdas(
+        s5_test_filt, s5_lh, s5_la,
+        p2_test_filt, p2_lh, p2_la,
+    )
+    ens_metrics = evaluate(ens_df, ens_lh, ens_la)
+    results["S6_ens_p2_mild"]    = ens_metrics
+    test_sizes["S6_ens_p2_mild"] = len(ens_df)
+    print(f"  Aligned rows : {len(ens_df):,}  (P2 ∩ S5 by match key)")
+    print(f"  Metrics      : {ens_metrics}")
+
+# ── Scenario 3 — Ensemble: P2 (loaded) + S1 (time-decay retrain) ─────────────
+if p2_lh is not None and s1_lh is not None:
+    print(f"\n{'='*70}")
+    print("  Scenario 3 — Ensemble: P2 (Intl+SW loaded) ⊕ S1 (Intl time-decay)")
+    print(f"{'='*70}")
+    ens_df, ens_lh, ens_la = align_lambdas(
+        s1_test_filt, s1_lh, s1_la,
+        p2_test_filt, p2_lh, p2_la,
+    )
+    ens_metrics = evaluate(ens_df, ens_lh, ens_la)
+    results["S3_ensemble"]    = ens_metrics
+    test_sizes["S3_ensemble"] = len(ens_df)
+    print(f"  Aligned rows : {len(ens_df):,}  (P2 ∩ S1 by match key)")
+    print(f"  Metrics      : {ens_metrics}")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -237,18 +323,31 @@ test_sizes["S2_intl_club"] = n
 # ─────────────────────────────────────────────────────────────────────────────
 
 # Ordered columns: Phase1 → S1 → S2 → Phase2
-COL_ORDER = ["P1_intl_loaded", "S1_intl_only", "S2_intl_club", "P2_intl_loaded"]
+COL_ORDER = [
+    "P1_intl_loaded", "S1_intl_only", "S2_intl_club",
+    "P2_intl_loaded", "S4_ensemble_p2p1",
+    "S5_mild_decay", "S6_ens_p2_mild",
+    "S3_ensemble",
+]
 LABELS = {
-    "P1_intl_loaded": "P1: Intl (saved)",
-    "S1_intl_only":   "S1: Intl (fresh)",
-    "S2_intl_club":   "S2: Intl+Club",
-    "P2_intl_loaded": "P2: Intl+SW (saved)",
+    "P1_intl_loaded":   "P1: Intl (saved)",
+    "S1_intl_only":     "S1: Intl (no decay)",
+    "S2_intl_club":     "S2: Intl+Club",
+    "P2_intl_loaded":   "P2: Intl+SW (saved)",
+    "S4_ensemble_p2p1": "S4: Ens P2+P1",
+    "S5_mild_decay":    "S5: Mild decay",
+    "S6_ens_p2_mild":   "S6: Ens P2+S5",
+    "S3_ensemble":      "S3: Ens P2+S1",
 }
 TRAIN_SIZES = {
-    "P1_intl_loaded": len(train_s1),
-    "S1_intl_only":   len(train_s1),
-    "S2_intl_club":   len(train_s2),
-    "P2_intl_loaded": len(train_p2),
+    "P1_intl_loaded":   len(train_s1),
+    "S1_intl_only":     len(train_s1),
+    "S2_intl_club":     len(train_s2),
+    "P2_intl_loaded":   len(train_p2),
+    "S4_ensemble_p2p1": len(train_s1),
+    "S5_mild_decay":    len(train_s1),
+    "S6_ens_p2_mild":   len(train_s1),
+    "S3_ensemble":      len(train_s1),
 }
 
 keys  = [k for k in COL_ORDER if k in results]
@@ -301,10 +400,14 @@ def delta(a, b, metric):
     else:
         return v_b - v_a   # higher is better
 
-p1 = results.get("P1_intl_loaded", {})
-s1 = results.get("S1_intl_only",   {})
-s2 = results.get("S2_intl_club",   {})
-p2 = results.get("P2_intl_loaded", {})
+p1 = results.get("P1_intl_loaded",   {})
+s1 = results.get("S1_intl_only",    {})
+s2 = results.get("S2_intl_club",    {})
+p2 = results.get("P2_intl_loaded",  {})
+s3 = results.get("S3_ensemble",     {})
+s4 = results.get("S4_ensemble_p2p1",{})
+s5 = results.get("S5_mild_decay",   {})
+s6 = results.get("S6_ens_p2_mild",  {})
 
 print("\n" + "─" * 90)
 print("ANALYSIS")
@@ -342,6 +445,54 @@ if s2 and p2:
         sign = "+" if d > 0 else ""
         tag  = "S2 better" if d > 0 else "P2 better" if d < 0 else "TIED     "
         print(f"    {m:<22}  P2={p2[m]:.6f}  S2={s2[m]:.6f}  Δ={sign}{d:.6f}  [{tag}]")
+
+if p1 and s4:
+    print("\n  S4 vs P1 — does P2+P1 ensemble beat P1 alone?")
+    for m in ["log_loss", "rps", "accuracy", "exact_score_pct"]:
+        d = delta(p1, s4, m)
+        sign = "+" if d > 0 else ""
+        tag  = "IMPROVES" if d > 0 else "HURTS   " if d < 0 else "NO CHANGE"
+        print(f"    {m:<22}  P1={p1[m]:.6f}  S4={s4[m]:.6f}  Δ={sign}{d:.6f}  [{tag}]")
+
+if p2 and s4:
+    print("\n  S4 vs P2 — does P2+P1 ensemble beat P2 alone?")
+    for m in ["log_loss", "rps", "accuracy", "exact_score_pct"]:
+        d = delta(p2, s4, m)
+        sign = "+" if d > 0 else ""
+        tag  = "IMPROVES" if d > 0 else "HURTS   " if d < 0 else "NO CHANGE"
+        print(f"    {m:<22}  P2={p2[m]:.6f}  S4={s4[m]:.6f}  Δ={sign}{d:.6f}  [{tag}]")
+
+if s1 and s3:
+    print("\n  S3 vs S1 — does ensembling P2 help over S1 (time-decay) alone?")
+    for m in ["log_loss", "rps", "accuracy", "exact_score_pct"]:
+        d = delta(s1, s3, m)
+        sign = "+" if d > 0 else ""
+        tag  = "IMPROVES" if d > 0 else "HURTS   " if d < 0 else "NO CHANGE"
+        print(f"    {m:<22}  S1={s1[m]:.6f}  S3={s3[m]:.6f}  Δ={sign}{d:.6f}  [{tag}]")
+
+if p2 and s3:
+    print("\n  S3 vs P2 — does ensembling beat P2 alone?")
+    for m in ["log_loss", "rps", "accuracy", "exact_score_pct"]:
+        d = delta(p2, s3, m)
+        sign = "+" if d > 0 else ""
+        tag  = "IMPROVES" if d > 0 else "HURTS   " if d < 0 else "NO CHANGE"
+        print(f"    {m:<22}  P2={p2[m]:.6f}  S3={s3[m]:.6f}  Δ={sign}{d:.6f}  [{tag}]")
+
+if p1 and s5:
+    print("\n  S5 vs P1 — does mild CB decay (λ=0.00005) beat no-decay baseline?")
+    for m in ["log_loss", "rps", "accuracy", "exact_score_pct"]:
+        d = delta(p1, s5, m)
+        sign = "+" if d > 0 else ""
+        tag  = "IMPROVES" if d > 0 else "HURTS   " if d < 0 else "NO CHANGE"
+        print(f"    {m:<22}  P1={p1[m]:.6f}  S5={s5[m]:.6f}  Δ={sign}{d:.6f}  [{tag}]")
+
+if p2 and s6:
+    print("\n  S6 vs P2 — does P2+mild-decay ensemble beat P2 alone?")
+    for m in ["log_loss", "rps", "accuracy", "exact_score_pct"]:
+        d = delta(p2, s6, m)
+        sign = "+" if d > 0 else ""
+        tag  = "IMPROVES" if d > 0 else "HURTS   " if d < 0 else "NO CHANGE"
+        print(f"    {m:<22}  P2={p2[m]:.6f}  S6={s6[m]:.6f}  Δ={sign}{d:.6f}  [{tag}]")
 
 
 # ─────────────────────────────────────────────────────────────────────────────

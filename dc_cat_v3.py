@@ -354,11 +354,17 @@ def _make_cb_params(depth, lr):
         random_seed=42,
     )
 
-def train_catboost_poisson(X_train, y_home, y_away, tune=True, depth=5, lr=0.05):
+def train_catboost_poisson(X_train, y_home, y_away, tune=True, depth=5, lr=0.05, sample_weight=None):
     cat_features = ["home_team", "away_team"]
-    X_tr, X_val, yh_tr, yh_val, ya_tr, ya_val = train_test_split(
-        X_train, y_home, y_away, test_size=0.1, random_state=42
-    )
+    split_inputs = [X_train, y_home, y_away]
+    if sample_weight is not None:
+        split_inputs.append(sample_weight)
+    split = train_test_split(*split_inputs, test_size=0.1, random_state=42)
+    if sample_weight is not None:
+        X_tr, X_val, yh_tr, yh_val, ya_tr, ya_val, w_tr, _ = split
+    else:
+        X_tr, X_val, yh_tr, yh_val, ya_tr, ya_val = split
+        w_tr = None
 
     if tune:
         depths = [3, 4, 5]
@@ -373,8 +379,8 @@ def train_catboost_poisson(X_train, y_home, y_away, tune=True, depth=5, lr=0.05)
                 p  = _make_cb_params(d, l)
                 mh = CatBoostRegressor(**p)
                 ma = CatBoostRegressor(**p)
-                mh.fit(X_tr, yh_tr, cat_features=cat_features, eval_set=(X_val, yh_val))
-                ma.fit(X_tr, ya_tr, cat_features=cat_features, eval_set=(X_val, ya_val))
+                mh.fit(X_tr, yh_tr, cat_features=cat_features, eval_set=(X_val, yh_val), sample_weight=w_tr)
+                ma.fit(X_tr, ya_tr, cat_features=cat_features, eval_set=(X_val, ya_val), sample_weight=w_tr)
                 lh, la = _cb_val_loss(mh), _cb_val_loss(ma)
                 print(f"    depth={d} lr={l:.2f}  →  home_val={lh:.4f}  away_val={la:.4f}")
                 if lh < best_loss_h: best_loss_h, best_home, best_params_h = lh, mh, p
@@ -389,8 +395,8 @@ def train_catboost_poisson(X_train, y_home, y_away, tune=True, depth=5, lr=0.05)
         p  = _make_cb_params(depth, lr)
         mh = CatBoostRegressor(**p)
         ma = CatBoostRegressor(**p)
-        mh.fit(X_tr, yh_tr, cat_features=cat_features, eval_set=(X_val, yh_val))
-        ma.fit(X_tr, ya_tr, cat_features=cat_features, eval_set=(X_val, ya_val))
+        mh.fit(X_tr, yh_tr, cat_features=cat_features, eval_set=(X_val, yh_val), sample_weight=w_tr)
+        ma.fit(X_tr, ya_tr, cat_features=cat_features, eval_set=(X_val, ya_val), sample_weight=w_tr)
         print(f"  home_val={_cb_val_loss(mh):.4f}  away_val={_cb_val_loss(ma):.4f}")
         return mh, ma
 
@@ -451,7 +457,7 @@ def evaluate(df, lh_arr, la_arr, max_goals=8):
 # ─────────────────────────────────────────────────────────────
 
 def run_pipeline(train_df, test_df, decay_lambda=0.0005, reg=0.0001,
-                 dc_maxiter=2000, tune=True, cb_depth=5, cb_lr=0.05):
+                 dc_maxiter=2000, tune=True, cb_depth=5, cb_lr=0.05, cb_decay_lambda=0.0):
 
     print("─── Stage 1: DC base model ───")
     result, teams, team_to_idx = fit_dc_base(train_df, decay_lambda, reg, maxiter=dc_maxiter)
@@ -467,8 +473,16 @@ def run_pipeline(train_df, test_df, decay_lambda=0.0005, reg=0.0001,
     y_away = train_df["away_goals"].values.astype(float)
 
     print("─── Stage 2: CatBoost Poisson ───")
+    if cb_decay_lambda > 0:
+        dates = pd.to_datetime(train_df['date'], errors='coerce')
+        days_since_cb = (dates.max() - dates).dt.days.fillna(0).values.astype(float)
+        cb_weights = np.exp(-cb_decay_lambda * days_since_cb)
+        print(f"  CB time-decay: λ={cb_decay_lambda}  weights [{cb_weights.min():.3f}, {cb_weights.max():.3f}]  mean={cb_weights.mean():.3f}")
+    else:
+        cb_weights = None
     m_home, m_away = train_catboost_poisson(X_train, y_home, y_away,
-                                            tune=tune, depth=cb_depth, lr=cb_lr)
+                                            tune=tune, depth=cb_depth, lr=cb_lr,
+                                            sample_weight=cb_weights)
     print(f"  home best iter: {m_home.best_iteration_}  |  away best iter: {m_away.best_iteration_}")
 
     lh_train = np.clip(m_home.predict(X_train), 0.05, 10)
@@ -486,7 +500,7 @@ def run_pipeline(train_df, test_df, decay_lambda=0.0005, reg=0.0001,
     print("  [TRAIN]", {k: v for k, v in train_metrics.items()})
     print("  [TEST] ", {k: v for k, v in test_metrics.items()})
 
-    return test_metrics, m_home, m_away, result.x, team_to_idx
+    return test_metrics, m_home, m_away, result.x, team_to_idx, lh_test, la_test
 
 
 # ─────────────────────────────────────────────────────────────
@@ -533,7 +547,7 @@ if __name__ == "__main__":
 
     # ── Phase 1: International ────────────────────────────────────
     print("=== DC + CatBoost Poisson v3 — Phase 1: International ===\n")
-    metrics, m_home, m_away, dc_params, team_to_idx = run_pipeline(
+    metrics, m_home, m_away, dc_params, team_to_idx, _, _ = run_pipeline(
         train_intl, test_intl, dc_maxiter=5000
     )
     all_results["intl"] = metrics
@@ -541,7 +555,7 @@ if __name__ == "__main__":
 
     # ── Phase 1: Club ─────────────────────────────────────────────
     print("\n=== DC + CatBoost Poisson v3 — Phase 1: Club ===\n")
-    metrics, m_home, m_away, dc_params, team_to_idx = run_pipeline(
+    metrics, m_home, m_away, dc_params, team_to_idx, _, _ = run_pipeline(
         train_club, test_club, dc_maxiter=500, tune=False, cb_depth=5, cb_lr=0.05
     )
     all_results["club"] = metrics
@@ -584,14 +598,14 @@ if __name__ == "__main__":
         test_club_p2,  _ = add_form_features(test_club,  seed=club_hist)
 
         print("=== Phase 2: International ===\n")
-        metrics_p2, mh2, ma2, dcp2, t2i2 = run_pipeline(
+        metrics_p2, mh2, ma2, dcp2, t2i2, _, _ = run_pipeline(
             combined_intl_form, test_intl_p2, dc_maxiter=5000
         )
         all_results["intl_p2"] = metrics_p2
         save_pipeline("phase2_intl", mh2, ma2, dcp2, t2i2)
 
         print("\n=== Phase 2: Club ===\n")
-        metrics_p2c, mh2c, ma2c, dcp2c, t2i2c = run_pipeline(
+        metrics_p2c, mh2c, ma2c, dcp2c, t2i2c, _, _ = run_pipeline(
             combined_club_form, test_club_p2, dc_maxiter=500, tune=False, cb_depth=5, cb_lr=0.05
         )
         all_results["club_p2"] = metrics_p2c
