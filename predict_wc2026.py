@@ -24,6 +24,7 @@ from dc_cat_v3 import (
 )
 from preprocessor_v2 import dedup_datasets
 from poisson_predict import qualified_teams, normalize_team_name
+from predict_cards_corners import build_predictions_for_fixtures, predict_match as predict_cc_match
 
 N_SIMS   = 10_000
 RNG_SEED = 42
@@ -212,7 +213,23 @@ for _, fx in fixtures.iterrows():
         "p_home": p_h, "p_draw": p_d, "p_away": p_a,
         "predicted_score": score,
     }
-    print(f"  [{fx['group']}] {home:25s} vs {away:25s}  {lh:.2f}-{la:.2f}  → {score}")
+    print(f"  [{fx['group']}] {home:25s} vs {away:25s}  {lh:.2f}-{la:.2f}  -> {score}")
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 6b. CARDS & CORNERS — GROUP STAGE
+# ─────────────────────────────────────────────────────────────────────────────
+
+print("\nPrecomputing cards & corners for group stage ...")
+_cc_preds, _cc_team_stats, _cc_globals = build_predictions_for_fixtures(
+    fixtures, cards_path="match_cards_corners.csv", min_year=2014
+)
+for mid, cc in _cc_preds.items():
+    group_preds[mid].update(cc)
+
+_cc_df = pd.DataFrame(list(_cc_preds.values()))
+print(f"  Avg total yellow : {_cc_df['total_yellow'].mean():.1f}  (expect ~3.8)")
+print(f"  Avg total corners: {_cc_df['total_corners'].mean():.1f}  (expect ~9.2)")
+print(f"  Avg total red    : {_cc_df['total_red'].mean():.2f}  (expect ~0.1-0.3)")
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 7. PRECOMPUTE KNOCKOUT MATCH LAMBDAS (all 48×48 pairs, neutral form)
@@ -421,10 +438,11 @@ def run_one_simulation():
 
     # ── Knockout rounds ───────────────────────────────────────────────────────
     current_matches = dict(r32_bracket)  # match_id → (home, away)
-    match_winner = {}
-    match_loser  = {}
-    match_score  = {}
-    match_pens   = {}
+    match_winner     = {}
+    match_loser      = {}
+    match_score      = {}
+    match_pens       = {}
+    match_home_teams = {}  # track which team was designated home in each KO slot
 
     round_groups = {
         "Round of 32": list(
@@ -439,6 +457,7 @@ def run_one_simulation():
         "Semi-final": list(
             knockout_slots[knockout_slots["round"] == "Semi-final"]["match_id"].astype(int)
         ),
+        "Third-place playoff": [103],
         "Final": [104],
     }
 
@@ -449,10 +468,11 @@ def run_one_simulation():
             home, away       = current_matches[mid]
             w, hg, ag, pens  = simulate_knockout_match(home, away)
             loser            = away if w == home else home
-            match_winner[mid] = w
-            match_loser[mid]  = loser
-            match_score[mid]  = f"{hg}-{ag}" + (" (pens)" if pens else "")
-            match_pens[mid]   = pens
+            match_winner[mid]     = w
+            match_loser[mid]      = loser
+            match_score[mid]      = f"{hg}-{ag}" + (" (pens)" if pens else "")
+            match_pens[mid]       = pens
+            match_home_teams[mid] = home
 
         # Propagate winners/losers to next round slots
         next_rows = knockout_slots[
@@ -475,7 +495,7 @@ def run_one_simulation():
             if h and a:
                 current_matches[mid] = (h, a)
 
-    return match_winner, match_loser, match_score, match_pens, group_rankings
+    return match_winner, match_loser, match_score, match_pens, group_rankings, match_home_teams
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 9. RUN MONTE CARLO
@@ -490,6 +510,10 @@ advance_counts = {r: defaultdict(int) for r in ROUNDS}
 ko_bracket_wins = defaultdict(lambda: defaultdict(int))  # match_id → team → count
 group_rank_counts = defaultdict(lambda: defaultdict(int))  # team → "1st"/"2nd"/"3rd"/"4th" → count
 
+ko_pens_counts = defaultdict(int)
+ko_home_counts = defaultdict(lambda: defaultdict(int))
+ko_away_counts = defaultdict(lambda: defaultdict(int))
+
 all_ko_mid = list(knockout_slots["match_id"].astype(int))
 r32_mids   = list(knockout_slots[knockout_slots["round"] == "Round of 32"]["match_id"].astype(int))
 r16_mids   = list(knockout_slots[knockout_slots["round"] == "Round of 16"]["match_id"].astype(int))
@@ -497,7 +521,7 @@ qf_mids    = list(knockout_slots[knockout_slots["round"] == "Quarter-final"]["ma
 sf_mids    = list(knockout_slots[knockout_slots["round"] == "Semi-final"]["match_id"].astype(int))
 
 for sim in range(N_SIMS):
-    win, lose, score, pens, g_rank = run_one_simulation()
+    win, lose, score, pens, g_rank, home_teams = run_one_simulation()
 
     # Track group stage qualifiers
     for g, ranked in g_rank.items():
@@ -524,6 +548,16 @@ for sim in range(N_SIMS):
         if mid in win:
             ko_bracket_wins[mid][win[mid]] += 1
 
+    # Track penalty frequency and home/away identity per KO slot
+    for mid in all_ko_mid:
+        if pens.get(mid, False):
+            ko_pens_counts[mid] += 1
+        if mid in home_teams and mid in win:
+            h = home_teams[mid]
+            a = lose[mid] if win[mid] == h else win[mid]
+            ko_home_counts[mid][h] += 1
+            ko_away_counts[mid][a] += 1
+
     if (sim + 1) % 2000 == 0:
         elapsed = time.time() - t0
         print(f"  {sim+1:,}/{N_SIMS:,}  ({elapsed:.0f}s)")
@@ -538,6 +572,15 @@ print(f"  Complete: {N_SIMS:,} runs in {elapsed:.1f}s")
 group_pred_rows = []
 for mid in match_ids_ordered:
     p = group_preds[mid]
+
+    _h, _a = map(int, p["predicted_score"].split("-"))
+    if _h > _a:
+        pred_winner = "home"
+    elif _a > _h:
+        pred_winner = "away"
+    else:
+        pred_winner = "draw"
+
     group_pred_rows.append({
         "match_id":            mid,
         "group":               p["group"],
@@ -549,6 +592,16 @@ for mid in match_ids_ordered:
         "prob_home_win":       round(p["p_home"], 4),
         "prob_draw":           round(p["p_draw"], 4),
         "prob_away_win":       round(p["p_away"], 4),
+        "predicted_winner":         pred_winner,
+        "predicted_home_yellow":    p.get("home_yellow",  0),
+        "predicted_away_yellow":    p.get("away_yellow",  0),
+        "predicted_total_yellow":   p.get("total_yellow", 0),
+        "predicted_home_red":       p.get("home_red",     0),
+        "predicted_away_red":       p.get("away_red",     0),
+        "predicted_total_red":      p.get("total_red",    0),
+        "predicted_home_corners":   p.get("home_corners", 0),
+        "predicted_away_corners":   p.get("away_corners", 0),
+        "predicted_total_corners":  p.get("total_corners",0),
     })
 
 group_pred_df = pd.DataFrame(group_pred_rows)
@@ -590,34 +643,56 @@ for _, row in knockout_slots.sort_values("match_id").iterrows():
     most_likely_winner = max(ko_bracket_wins[mid], key=ko_bracket_wins[mid].get, default="TBD")
     win_pct = round(ko_bracket_wins[mid].get(most_likely_winner, 0) / N_SIMS, 4) if ko_bracket_wins[mid] else 0.0
 
-    # Deterministic scoreline for the most likely matchup
-    if ko_bracket_wins[mid]:
-        opponents = ko_bracket_wins[mid]
-        # Find the most likely opponent (the team most often paired against the winner in this slot)
-        # This is approximate; use the top-2 most frequent teams in this slot
-        teams_in_slot = sorted(ko_bracket_wins[mid].keys(), key=lambda t: -ko_bracket_wins[mid][t])
-        if len(teams_in_slot) >= 2:
-            h_det, a_det = teams_in_slot[0], teams_in_slot[1]
-            lh_d = ko_lh_mat[team_idx.get(h_det, 0), team_idx.get(a_det, 0)]
-            la_d = ko_la_mat[team_idx.get(h_det, 0), team_idx.get(a_det, 0)]
-            pm_d = poisson_prob_matrix(lh_d, la_d)
-            ph_d, pa_d = np.unravel_index(np.argmax(pm_d), pm_d.shape)
-            det_score = f"{ph_d}-{pa_d}"
-        else:
-            det_score = "?-?"
+    # Most likely home/away team from MC-tracked identity
+    pred_home_team = max(ko_home_counts[mid], key=ko_home_counts[mid].get) if ko_home_counts[mid] else "TBD"
+    pred_away_team = max(ko_away_counts[mid], key=ko_away_counts[mid].get) if ko_away_counts[mid] else "TBD"
+
+    # Deterministic MAP score for the most likely matchup (clean H-A, no pens suffix)
+    if pred_home_team != "TBD" and pred_away_team != "TBD":
+        lh_d = ko_lh_mat[team_idx.get(pred_home_team, 0), team_idx.get(pred_away_team, 0)]
+        la_d = ko_la_mat[team_idx.get(pred_home_team, 0), team_idx.get(pred_away_team, 0)]
+        pm_d = poisson_prob_matrix(lh_d, la_d)
+        ph_d, pa_d = np.unravel_index(np.argmax(pm_d), pm_d.shape)
+        det_score = f"{ph_d}-{pa_d}"
     else:
         det_score = "TBD"
 
+    # Penalty prediction from MC frequency
+    p_pens = round(ko_pens_counts[mid] / N_SIMS, 4)
+    pred_penalties = p_pens > 0.35   # threshold above historical ~28% mean; False dominates EV
+
+    # Winner side
+    if most_likely_winner == pred_home_team:
+        pred_winner_side = "home"
+    elif most_likely_winner == pred_away_team:
+        pred_winner_side = "away"
+    else:
+        pred_winner_side = "home"
+
+    # Cards & corners for this matchup
+    if pred_home_team != "TBD" and pred_away_team != "TBD":
+        ko_cc = predict_cc_match(pred_home_team, pred_away_team, _cc_team_stats, _cc_globals)
+    else:
+        ko_cc = {"total_yellow": 4, "total_red": 0, "total_corners": 9}
+
     bracket_rows.append({
-        "match_id":      mid,
-        "round":         row["round"],
-        "date_utc":      row["date_utc"],
-        "venue":         row["venue"],
-        "predicted_winner": most_likely_winner,
-        "winner_pct":    win_pct,
-        "predicted_score": det_score,
-        "slot_home":     row["slot_home"],
-        "slot_away":     row["slot_away"],
+        "match_id":              mid,
+        "round":                 row["round"],
+        "date_utc":              row["date_utc"],
+        "venue":                 row["venue"],
+        "slot_home":             row["slot_home"],
+        "slot_away":             row["slot_away"],
+        "predicted_home_team":   pred_home_team,
+        "predicted_away_team":   pred_away_team,
+        "predicted_winner":      most_likely_winner,
+        "predicted_winner_side": pred_winner_side,
+        "winner_pct":            win_pct,
+        "predicted_score":       det_score,
+        "p_penalties":           p_pens,
+        "predicted_penalties":   pred_penalties,
+        "predicted_total_yellow":  ko_cc.get("total_yellow",  4),
+        "predicted_total_red":     ko_cc.get("total_red",     0),
+        "predicted_total_corners": ko_cc.get("total_corners", 9),
     })
 
 bracket_df = pd.DataFrame(bracket_rows)
@@ -652,7 +727,107 @@ prob_df.to_csv("wc2026_win_probabilities.csv", index=False)
 print("Saved: wc2026_win_probabilities.csv")
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 14. CONSOLE SUMMARY
+# 14. FULL COMPETITION SUBMISSION (104 matches)
+# ─────────────────────────────────────────────────────────────────────────────
+
+print("\nGenerating wc2026_submission.csv (104 matches) ...")
+
+submission_rows = []
+
+# ── Group stage (matches 1–72) ───────────────────────────────────────────────
+for mid in match_ids_ordered:
+    p = group_preds[mid]
+
+    _h, _a = map(int, p["predicted_score"].split("-"))
+    if _h > _a:
+        pred_winner = "home"
+    elif _a > _h:
+        pred_winner = "away"
+    else:
+        pred_winner = "draw"
+
+    submission_rows.append({
+        "match_id":           mid,
+        "round":              "Group Stage",
+        "multiplier":         1,
+        "home_team":          p["home_team"],
+        "away_team":          p["away_team"],
+        "score":              p["predicted_score"],
+        "total_corners":      p.get("total_corners", 9),
+        "total_yellow_cards": p.get("total_yellow",  4),
+        "total_red_cards":    p.get("total_red",     0),
+        "winning_team":       pred_winner,
+        "matchup_home":       "",
+        "matchup_away":       "",
+        "match_winner":       "",
+        "penalties":          "",
+    })
+
+# ── Knockout stage (matches 73–104) ─────────────────────────────────────────
+for _, brow in bracket_df.iterrows():
+    mid       = int(brow["match_id"])
+    pred_home = brow["predicted_home_team"]
+    pred_away = brow["predicted_away_team"]
+    winner    = brow["predicted_winner"]
+
+    if winner == pred_home:
+        winner_side = "home"
+    elif winner == pred_away:
+        winner_side = "away"
+    else:
+        winner_side = "home"
+
+    mult_row = knockout_slots.loc[knockout_slots["match_id"] == mid, "multiplier"]
+    mult = int(mult_row.iloc[0]) if not mult_row.empty else 1
+
+    submission_rows.append({
+        "match_id":           mid,
+        "round":              brow["round"],
+        "multiplier":         mult,
+        "home_team":          pred_home,
+        "away_team":          pred_away,
+        "score":              brow["predicted_score"],
+        "total_corners":      int(brow["predicted_total_corners"]),
+        "total_yellow_cards": int(brow["predicted_total_yellow"]),
+        "total_red_cards":    int(brow["predicted_total_red"]),
+        "winning_team":       "",
+        "matchup_home":       pred_home,
+        "matchup_away":       pred_away,
+        "match_winner":       winner_side,
+        "penalties":          str(brow["predicted_penalties"]),
+    })
+
+submission_df = (
+    pd.DataFrame(submission_rows)
+    .sort_values("match_id")
+    .reset_index(drop=True)
+)
+submission_df.to_csv("wc2026_submission.csv", index=False)
+print(f"  Saved: wc2026_submission.csv  ({len(submission_df)} rows)")
+
+# ── Assertions ────────────────────────────────────────────────────────────────
+assert len(submission_df) == 104, f"Expected 104 rows, got {len(submission_df)}"
+grp_rows = submission_df[submission_df["round"] == "Group Stage"]
+ko_rows  = submission_df[submission_df["round"] != "Group Stage"]
+assert len(grp_rows) == 72,  f"Expected 72 group rows, got {len(grp_rows)}"
+assert len(ko_rows)  == 32,  f"Expected 32 KO rows, got {len(ko_rows)}"
+assert grp_rows["winning_team"].isin(["home", "draw", "away"]).all()
+assert ko_rows["match_winner"].isin(["home", "away"]).all()
+assert ko_rows["penalties"].isin(["True", "False"]).all()
+assert ko_pens_counts[103] > 0, "Third-place (mid=103) was never simulated"
+
+cc_check = pd.DataFrame(list(_cc_preds.values()))
+assert cc_check["total_yellow"].between(0, 12).all()
+assert cc_check["total_corners"].between(3, 20).all()
+
+pen_rate = (ko_rows["penalties"] == "True").mean()
+print(f"  KO penalty rate  : {pen_rate:.1%}  (expect 20-35%)")
+print(f"  P(Final pens)    : {ko_pens_counts[104]/N_SIMS:.1%}")
+print("  All assertions passed.")
+print("Saved: wc2026_submission.csv")
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 15. CONSOLE SUMMARY
 # ─────────────────────────────────────────────────────────────────────────────
 
 print("\n" + "=" * 70)
@@ -679,11 +854,12 @@ finalist2 = top_finalists[1] if len(top_finalists) > 1 else "TBD"
 final_winner = prob_df.iloc[0]["team"]
 final_score_row = bracket_df[bracket_df["match_id"] == 104]
 final_score = final_score_row.iloc[0]["predicted_score"] if not final_score_row.empty else "?-?"
-print(f"  Predicted final : {finalist1} vs {finalist2} → {final_winner} {final_score}")
+print(f"  Predicted final : {finalist1} vs {finalist2} -> {final_winner} {final_score}")
 
 print("\n  Output files:")
 print("    wc2026_group_predictions.csv")
 print("    wc2026_group_standings.csv")
 print("    wc2026_knockout_bracket.csv")
 print("    wc2026_win_probabilities.csv")
+print("    wc2026_submission.csv")
 print("=" * 70)

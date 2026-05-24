@@ -1,0 +1,513 @@
+match_id,competition_id,competition_name,season_id,season_name,match_date,home_team_id,home_team_name,away_team_id,away_team_name,home_score,away_score,home_corners,away_corners
+3923881,1267,African Cup of Nations,107,2023,2024-02-11,775,Nigeria,3374,Côte d'Ivoire,1,2,4,5
+3923880,1267,African Cup of Nations,107,2023,2024-02-10,4976,South Africa,4881,Congo DR,0,0,2,1
+3922838,1267,African Cup of Nations,107,2023,2024-02-07,3374,Côte d'Ivoire,4881,Congo DR,1,0,6,6
+3922837,1267,African Cup of Nations,107,2023,2024-02-07,775,Nigeria,4976,South Africa,1,1,5,4
+3922242,1267,African Cup of Nations,107,2023,2024-01-29,787,Senegal,3374,Côte d'Ivoire,1,1,6,2
+3922239,1267,African Cup of Nations,107,2023,2024-01-28,4992,Equatorial Guinea,4892,Guinea,0,1,2,2
+3922659,1267,African Cup of Nations,107,2023,2024-02-03,4930,Mali,3374,Côte d'Ivoire,1,2,10,2
+3922658,1267,African Cup of Nations,107,2023,2024-02-03,4924,Cape Verde Islands,4976,South Africa,0,0,10,4
+3922244,1267,African Cup of Nations,107,2023,2024-01-30,4930,Mali,4921,Burkina Faso,2,1,1,2
+3922356,1267,African Cup of Nations,107,2023,2024-02-02,4881,Congo DR,4892,Guinea,3,1,3,4
+3922321,1267,African Cup of Nations,107,2023,2024-02-02,775,Nigeria,4901,Angola,1,0,4,7
+3922237,1267,African Cup of Nations,107,2023,2024-01-27,4901,Angola,4980,Namibia,3,0,6,3
+3922243,1267,African Cup of Nations,107,2023,2024-01-30,788,Morocco,4976,South Africa,0,2,6,2
+3922241,1267,African Cup of Nations,107,2023,2024-01-29,4924,Cape Verde Islands,4932,Mauritania,1,0,11,1
+3922240,1267,African Cup of Nations,107,2023,2024-01-28,774,Egypt,4881,Congo DR,1,1,2,4
+3922238,1267,African Cup of Nations,107,2023,2024-01-27,775,Nigeria,2722,Cameroon,2,0,3,1
+3920396,1267,African Cup of Nations,107,2023,2024-01-18,774,Egypt,4885,Ghana,2,2,3,4
+3920386,1267,African Cup of Nations,107,2023,2024-01-14,775,Nigeria,4992,Equatorial Guinea,1,1,2,3
+3920385,1267,African Cup of Nations,107,2023,2024-01-14,774,Egypt,4978,Mozambique,2,2,7,2
+3920387,1267,African Cup of Nations,107,2023,2024-01-14,4885,Ghana,4924,Cape Verde Islands,1,2,2,5
+3920419,1267,African Cup of Nations,107,2023,2024-01-24,4963,Zambia,788,Morocco,0,1,3,7
+3920418,1267,African Cup of Nations,107,2023,2024-01-24,4953,Tanzania,4881,Congo DR,0,0,1,4
+3920417,1267,African Cup of Nations,107,2023,2024-01-24,4980,Namibia,4930,Mali,0,0,9,3
+3920416,1267,African Cup of Nations,107,2023,2024-01-24,4976,South Africa,777,Tunisia,0,0,5,6
+3920415,1267,African Cup of Nations,107,2023,2024-01-23,4932,Mauritania,4898,Algeria,1,0,5,6
+3920414,1267,African Cup of Nations,107,2023,2024-01-23,4901,Angola,4921,Burkina Faso,2,0,1,6
+3920413,1267,African Cup of Nations,107,2023,2024-01-23,4934,Gambia,2722,Cameroon,2,3,7,5
+3920412,1267,African Cup of Nations,107,2023,2024-01-23,4892,Guinea,787,Senegal,0,2,0,6
+3920411,1267,African Cup of Nations,107,2023,2024-01-22,4924,Cape Verde Islands,774,Egypt,2,2,4,8
+3920410,1267,African Cup of Nations,107,2023,2024-01-22,4978,Mozambique,4885,Ghana,2,2,6,3
+3920409,1267,African Cup of Nations,107,2023,2024-01-22,4894,Guinea-Bissau,775,Nigeria,0,1,3,2
+3920408,1267,African Cup of Nations,107,2023,2024-01-22,4992,Equatorial Guinea,3374,Côte d'Ivoire,4,0,1,11
+3920407,1267,African Cup of Nations,107,2023,2024-01-21,4976,South Africa,4980,Namibia,4,0,6,2
+3920406,1267,African Cup of Nations,107,2023,2024-01-21,4963,Zambia,4953,Tanzania,1,1,5,3
+3920405,1267,African Cup of Nations,107,2023,2024-01-21,788,Morocco,4881,Congo DR,1,1,3,5
+3920404,1267,African Cup of Nations,107,2023,2024-01-20,777,Tunisia,4930,Mali,1,1,3,4
+3920403,1267,African Cup of Nations,107,2023,2024-01-20,4932,Mauritania,4901,Angola,2,3,6,11
+3920402,1267,African Cup of Nations,107,2023,2024-01-20,4898,Algeria,4921,Burkina Faso,2,2,4,1
+3920401,1267,African Cup of Nations,107,2023,2024-01-19,4892,Guinea,4934,Gambia,1,0,7,5
+3920400,1267,African Cup of Nations,107,2023,2024-01-19,787,Senegal,2722,Cameroon,3,1,8,9
+3920399,1267,African Cup of Nations,107,2023,2024-01-19,4924,Cape Verde Islands,4978,Mozambique,3,0,1,6
+3920398,1267,African Cup of Nations,107,2023,2024-01-18,3374,Côte d'Ivoire,775,Nigeria,0,1,5,6
+3920397,1267,African Cup of Nations,107,2023,2024-01-18,4992,Equatorial Guinea,4894,Guinea-Bissau,4,2,2,7
+3920395,1267,African Cup of Nations,107,2023,2024-01-17,4881,Congo DR,4963,Zambia,1,1,7,0
+3920394,1267,African Cup of Nations,107,2023,2024-01-17,788,Morocco,4953,Tanzania,3,0,5,2
+3920393,1267,African Cup of Nations,107,2023,2024-01-16,777,Tunisia,4980,Namibia,0,1,8,7
+3920392,1267,African Cup of Nations,107,2023,2024-01-16,4921,Burkina Faso,4932,Mauritania,1,0,3,4
+3920391,1267,African Cup of Nations,107,2023,2024-01-16,4930,Mali,4976,South Africa,2,0,2,3
+3920390,1267,African Cup of Nations,107,2023,2024-01-15,4898,Algeria,4901,Angola,1,1,14,2
+3920389,1267,African Cup of Nations,107,2023,2024-01-15,2722,Cameroon,4892,Guinea,1,1,5,0
+3920388,1267,African Cup of Nations,107,2023,2024-01-15,787,Senegal,4934,Gambia,3,0,6,4
+3920384,1267,African Cup of Nations,107,2023,2024-01-13,3374,Côte d'Ivoire,4894,Guinea-Bissau,2,0,6,2
+3943077,223,Copa America,282,2024,2024-07-15,779,Argentina,769,Colombia,1,0,4,7
+3943076,223,Copa America,282,2024,2024-07-14,1833,Canada,783,Uruguay,2,2,7,6
+3942852,223,Copa America,282,2024,2024-07-11,783,Uruguay,769,Colombia,0,1,4,3
+3942785,223,Copa America,282,2024,2024-07-10,779,Argentina,1833,Canada,2,0,2,2
+3942416,223,Copa America,282,2024,2024-07-07,769,Colombia,798,Panama,5,0,4,2
+3942415,223,Copa America,282,2024,2024-07-07,783,Uruguay,781,Brazil,0,0,6,2
+3939986,223,Copa America,282,2024,2024-06-30,779,Argentina,784,Peru,2,0,6,3
+3939973,223,Copa America,282,2024,2024-06-24,783,Uruguay,798,Panama,3,1,9,3
+3942229,223,Copa America,282,2024,2024-07-06,3563,Venezuela,1833,Canada,1,1,7,3
+3942228,223,Copa America,282,2024,2024-07-05,779,Argentina,3565,Ecuador,1,1,2,5
+3939985,223,Copa America,282,2024,2024-06-30,1833,Canada,3562,Chile,0,0,8,4
+3939984,223,Copa America,282,2024,2024-06-29,769,Colombia,795,Costa Rica,3,0,4,2
+3939981,223,Copa America,282,2024,2024-06-28,798,Panama,1839,United States,2,1,3,0
+3939992,223,Copa America,282,2024,2024-07-03,795,Costa Rica,3567,Paraguay,2,1,1,6
+3939991,223,Copa America,282,2024,2024-07-03,781,Brazil,769,Colombia,1,1,6,5
+3939990,223,Copa America,282,2024,2024-07-02,1839,United States,783,Uruguay,0,1,2,3
+3939989,223,Copa America,282,2024,2024-07-02,3564,Bolivia,798,Panama,1,3,2,1
+3939988,223,Copa America,282,2024,2024-07-01,794,Mexico,3565,Ecuador,0,0,5,2
+3939987,223,Copa America,282,2024,2024-07-01,2305,Jamaica,3563,Venezuela,0,3,6,9
+3939983,223,Copa America,282,2024,2024-06-29,3567,Paraguay,781,Brazil,1,4,4,6
+3939982,223,Copa America,282,2024,2024-06-28,783,Uruguay,3564,Bolivia,5,0,4,3
+3939980,223,Copa America,282,2024,2024-06-27,3565,Ecuador,2305,Jamaica,3,1,7,8
+3939979,223,Copa America,282,2024,2024-06-27,3563,Venezuela,794,Mexico,1,0,2,7
+3939978,223,Copa America,282,2024,2024-06-26,784,Peru,1833,Canada,0,1,2,1
+3939977,223,Copa America,282,2024,2024-06-26,3562,Chile,779,Argentina,0,1,0,11
+3939976,223,Copa America,282,2024,2024-06-25,781,Brazil,795,Costa Rica,0,0,9,1
+3939975,223,Copa America,282,2024,2024-06-25,769,Colombia,3567,Paraguay,2,1,3,3
+3939974,223,Copa America,282,2024,2024-06-24,1839,United States,3564,Bolivia,2,0,7,1
+3939972,223,Copa America,282,2024,2024-06-23,3565,Ecuador,3563,Venezuela,1,2,3,5
+3939971,223,Copa America,282,2024,2024-06-23,794,Mexico,2305,Jamaica,1,0,7,6
+3939970,223,Copa America,282,2024,2024-06-22,784,Peru,3562,Chile,0,0,1,3
+3939969,223,Copa America,282,2024,2024-06-21,779,Argentina,1833,Canada,2,0,7,4
+3888787,1470,FIFA U20 World Cup,274,1979,1979-09-07,9763,Argentina U20,17403,Soviet Union U20,3,1,8,2
+3857256,43,FIFA World Cup,106,2022,2022-12-02,786,Serbia,773,Switzerland,2,3,2,0
+3869151,43,FIFA World Cup,106,2022,2022-12-03,779,Argentina,792,Australia,2,1,1,3
+3857257,43,FIFA World Cup,106,2022,2022-11-30,792,Australia,776,Denmark,1,0,2,6
+3857258,43,FIFA World Cup,106,2022,2022-11-24,781,Brazil,786,Serbia,2,0,5,4
+3857288,43,FIFA World Cup,106,2022,2022-11-26,777,Tunisia,792,Australia,0,1,5,2
+3857267,43,FIFA World Cup,106,2022,2022-11-29,3565,Ecuador,787,Senegal,1,2,3,6
+3869321,43,FIFA World Cup,106,2022,2022-12-09,941,Netherlands,779,Argentina,2,2,2,8
+3857287,43,FIFA World Cup,106,2022,2022-11-24,783,Uruguay,791,South Korea,0,0,4,3
+3869486,43,FIFA World Cup,106,2022,2022-12-10,788,Morocco,780,Portugal,1,0,3,9
+3869685,43,FIFA World Cup,106,2022,2022-12-18,779,Argentina,771,France,3,3,6,5
+3857260,43,FIFA World Cup,106,2022,2022-11-30,799,Saudi Arabia,794,Mexico,1,2,1,8
+3857264,43,FIFA World Cup,106,2022,2022-11-30,789,Poland,779,Argentina,0,2,1,8
+3857266,43,FIFA World Cup,106,2022,2022-11-26,771,France,776,Denmark,2,1,6,4
+3857289,43,FIFA World Cup,106,2022,2022-11-26,779,Argentina,794,Mexico,2,0,4,2
+3857269,43,FIFA World Cup,106,2022,2022-11-28,781,Brazil,773,Switzerland,1,0,8,3
+3857294,43,FIFA World Cup,106,2022,2022-11-29,941,Netherlands,3566,Qatar,2,0,4,2
+3869254,43,FIFA World Cup,106,2022,2022-12-06,780,Portugal,773,Switzerland,6,1,6,6
+3869118,43,FIFA World Cup,106,2022,2022-12-04,768,England,787,Senegal,3,0,3,3
+3869684,43,FIFA World Cup,106,2022,2022-12-17,785,Croatia,788,Morocco,2,1,6,3
+3869519,43,FIFA World Cup,106,2022,2022-12-13,779,Argentina,785,Croatia,3,0,2,4
+3869354,43,FIFA World Cup,106,2022,2022-12-10,768,England,771,France,1,2,5,2
+3869552,43,FIFA World Cup,106,2022,2022-12-14,771,France,788,Morocco,2,0,2,3
+3869420,43,FIFA World Cup,106,2022,2022-12-09,785,Croatia,781,Brazil,1,1,3,7
+3869220,43,FIFA World Cup,106,2022,2022-12-06,788,Morocco,772,Spain,0,0,0,8
+3869219,43,FIFA World Cup,106,2022,2022-12-05,778,Japan,785,Croatia,1,1,8,5
+3869253,43,FIFA World Cup,106,2022,2022-12-05,781,Brazil,791,South Korea,4,1,5,4
+3869152,43,FIFA World Cup,106,2022,2022-12-04,771,France,789,Poland,3,1,7,1
+3869117,43,FIFA World Cup,106,2022,2022-12-03,941,Netherlands,1839,United States,3,1,4,5
+3857270,43,FIFA World Cup,106,2022,2022-11-28,780,Portugal,783,Uruguay,2,0,6,2
+3857263,43,FIFA World Cup,106,2022,2022-11-27,772,Spain,770,Germany,1,1,6,5
+3857259,43,FIFA World Cup,106,2022,2022-11-28,2722,Cameroon,786,Serbia,3,3,4,3
+3857295,43,FIFA World Cup,106,2022,2022-11-27,778,Japan,795,Costa Rica,0,1,5,0
+3857283,43,FIFA World Cup,106,2022,2022-11-27,782,Belgium,788,Morocco,0,2,9,1
+3857284,43,FIFA World Cup,106,2022,2022-11-23,770,Germany,778,Japan,1,2,6,6
+3857282,43,FIFA World Cup,106,2022,2022-11-21,1839,United States,907,Wales,1,1,5,3
+3857286,43,FIFA World Cup,106,2022,2022-11-20,3566,Qatar,3565,Ecuador,0,2,1,3
+3857301,43,FIFA World Cup,106,2022,2022-11-25,3566,Qatar,787,Senegal,1,3,6,6
+3857300,43,FIFA World Cup,106,2022,2022-11-22,779,Argentina,799,Saudi Arabia,1,2,9,2
+3857299,43,FIFA World Cup,106,2022,2022-11-28,791,South Korea,4885,Ghana,2,3,12,5
+3857298,43,FIFA World Cup,106,2022,2022-11-24,780,Portugal,4885,Ghana,3,2,3,3
+3857297,43,FIFA World Cup,106,2022,2022-11-26,789,Poland,799,Saudi Arabia,2,0,4,5
+3857296,43,FIFA World Cup,106,2022,2022-12-01,785,Croatia,782,Belgium,0,0,2,4
+3857293,43,FIFA World Cup,106,2022,2022-12-02,4885,Ghana,783,Uruguay,0,2,5,2
+3857292,43,FIFA World Cup,106,2022,2022-12-01,795,Costa Rica,770,Germany,2,4,1,14
+3857291,43,FIFA World Cup,106,2022,2022-11-23,772,Spain,795,Costa Rica,7,0,5,0
+3857290,43,FIFA World Cup,106,2022,2022-11-24,773,Switzerland,2722,Cameroon,1,0,11,5
+3857285,43,FIFA World Cup,106,2022,2022-11-21,787,Senegal,941,Netherlands,0,2,6,7
+3857281,43,FIFA World Cup,106,2022,2022-11-27,785,Croatia,1833,Canada,4,1,5,2
+3857280,43,FIFA World Cup,106,2022,2022-12-02,2722,Cameroon,781,Brazil,1,0,3,11
+3857279,43,FIFA World Cup,106,2022,2022-11-22,771,France,792,Australia,4,1,8,1
+3857278,43,FIFA World Cup,106,2022,2022-11-29,797,Iran,1839,United States,0,1,1,5
+3857277,43,FIFA World Cup,106,2022,2022-11-23,788,Morocco,785,Croatia,0,0,0,5
+3857276,43,FIFA World Cup,106,2022,2022-12-01,1833,Canada,788,Morocco,1,2,6,2
+3857275,43,FIFA World Cup,106,2022,2022-11-30,777,Tunisia,771,France,1,0,7,8
+3857274,43,FIFA World Cup,106,2022,2022-11-25,941,Netherlands,3565,Ecuador,1,1,2,5
+3857273,43,FIFA World Cup,106,2022,2022-11-25,907,Wales,797,Iran,0,2,2,7
+3857272,43,FIFA World Cup,106,2022,2022-11-25,768,England,1839,United States,0,0,3,7
+3857271,43,FIFA World Cup,106,2022,2022-11-21,768,England,797,Iran,6,2,8,0
+3857268,43,FIFA World Cup,106,2022,2022-11-23,782,Belgium,1833,Canada,1,0,4,4
+3857265,43,FIFA World Cup,106,2022,2022-11-22,794,Mexico,789,Poland,0,0,6,5
+3857262,43,FIFA World Cup,106,2022,2022-12-02,791,South Korea,780,Portugal,2,1,5,4
+3857261,43,FIFA World Cup,106,2022,2022-11-29,907,Wales,768,England,0,3,1,6
+3857255,43,FIFA World Cup,106,2022,2022-12-01,778,Japan,772,Spain,2,1,0,2
+3857254,43,FIFA World Cup,106,2022,2022-11-22,776,Denmark,777,Tunisia,0,0,11,9
+7585,43,FIFA World Cup,3,2018,2018-07-03,769,Colombia,768,England,1,1,2,7
+7570,43,FIFA World Cup,3,2018,2018-06-28,768,England,782,Belgium,0,1,7,2
+7586,43,FIFA World Cup,3,2018,2018-07-03,790,Sweden,773,Switzerland,1,0,3,11
+7557,43,FIFA World Cup,3,2018,2018-06-25,797,Iran,780,Portugal,1,1,0,5
+7542,43,FIFA World Cup,3,2018,2018-06-20,780,Portugal,788,Morocco,1,0,5,7
+8656,43,FIFA World Cup,3,2018,2018-07-11,785,Croatia,768,England,2,1,8,4
+7554,43,FIFA World Cup,3,2018,2018-06-24,768,England,798,Panama,6,1,3,2
+7550,43,FIFA World Cup,3,2018,2018-06-22,786,Serbia,773,Switzerland,1,2,3,7
+7548,43,FIFA World Cup,3,2018,2018-06-22,781,Brazil,795,Costa Rica,2,0,10,1
+7578,43,FIFA World Cup,3,2018,2018-06-15,774,Egypt,783,Uruguay,0,1,0,5
+7553,43,FIFA World Cup,3,2018,2018-06-23,791,South Korea,794,Mexico,1,2,7,4
+7544,43,FIFA World Cup,3,2018,2018-06-20,783,Uruguay,799,Saudi Arabia,1,0,3,2
+7536,43,FIFA World Cup,3,2018,2018-06-18,782,Belgium,798,Panama,3,0,9,3
+7555,43,FIFA World Cup,3,2018,2018-06-24,789,Poland,769,Colombia,0,3,7,5
+7546,43,FIFA World Cup,3,2018,2018-06-21,771,France,784,Peru,1,0,5,2
+7539,43,FIFA World Cup,3,2018,2018-06-19,789,Poland,787,Senegal,1,2,3,3
+7538,43,FIFA World Cup,3,2018,2018-06-18,790,Sweden,791,South Korea,1,0,6,5
+7576,43,FIFA World Cup,3,2018,2018-06-15,780,Portugal,772,Spain,3,3,3,5
+7565,43,FIFA World Cup,3,2018,2018-06-27,786,Serbia,781,Brazil,0,2,5,8
+7551,43,FIFA World Cup,3,2018,2018-06-23,770,Germany,790,Sweden,2,1,5,3
+7537,43,FIFA World Cup,3,2018,2018-06-18,777,Tunisia,768,England,1,2,2,7
+7580,43,FIFA World Cup,3,2018,2018-06-30,771,France,779,Argentina,4,3,0,4
+8650,43,FIFA World Cup,3,2018,2018-07-06,781,Brazil,782,Belgium,1,2,8,4
+7581,43,FIFA World Cup,3,2018,2018-07-01,785,Croatia,776,Denmark,1,1,5,4
+7549,43,FIFA World Cup,3,2018,2018-06-22,775,Nigeria,793,Iceland,2,0,6,5
+7529,43,FIFA World Cup,3,2018,2018-06-16,785,Croatia,775,Nigeria,2,0,6,4
+7534,43,FIFA World Cup,3,2018,2018-06-17,770,Germany,794,Mexico,0,1,6,1
+7562,43,FIFA World Cup,3,2018,2018-06-26,792,Australia,784,Peru,0,2,8,3
+7571,43,FIFA World Cup,3,2018,2018-06-28,787,Senegal,769,Colombia,0,1,1,3
+7569,43,FIFA World Cup,3,2018,2018-06-28,798,Panama,777,Tunisia,1,2,0,6
+7568,43,FIFA World Cup,3,2018,2018-06-27,773,Switzerland,795,Costa Rica,2,2,6,3
+7530,43,FIFA World Cup,3,2018,2018-06-16,771,France,792,Australia,2,1,5,1
+7558,43,FIFA World Cup,3,2018,2018-06-25,783,Uruguay,796,Russia,3,0,4,2
+7583,43,FIFA World Cup,3,2018,2018-07-02,781,Brazil,794,Mexico,2,0,8,7
+7547,43,FIFA World Cup,3,2018,2018-06-21,776,Denmark,792,Australia,1,1,3,5
+7535,43,FIFA World Cup,3,2018,2018-06-17,795,Costa Rica,786,Serbia,0,1,5,4
+7584,43,FIFA World Cup,3,2018,2018-07-02,782,Belgium,778,Japan,3,2,8,4
+7545,43,FIFA World Cup,3,2018,2018-06-21,779,Argentina,785,Croatia,0,3,5,2
+8649,43,FIFA World Cup,3,2018,2018-07-06,783,Uruguay,771,France,0,2,4,3
+8658,43,FIFA World Cup,3,2018,2018-07-15,771,France,785,Croatia,4,2,2,6
+7561,43,FIFA World Cup,3,2018,2018-06-26,793,Iceland,785,Croatia,1,2,10,5
+7531,43,FIFA World Cup,3,2018,2018-06-16,779,Argentina,793,Iceland,1,1,10,2
+7582,43,FIFA World Cup,3,2018,2018-07-01,772,Spain,796,Russia,1,1,6,5
+7552,43,FIFA World Cup,3,2018,2018-06-23,782,Belgium,777,Tunisia,5,2,3,2
+7532,43,FIFA World Cup,3,2018,2018-06-16,784,Peru,776,Denmark,0,1,3,7
+7560,43,FIFA World Cup,3,2018,2018-06-25,772,Spain,788,Morocco,2,2,7,1
+7533,43,FIFA World Cup,3,2018,2018-06-17,781,Brazil,773,Switzerland,1,1,7,2
+7564,43,FIFA World Cup,3,2018,2018-06-26,775,Nigeria,779,Argentina,1,2,3,5
+7579,43,FIFA World Cup,3,2018,2018-06-30,783,Uruguay,780,Portugal,2,1,2,9
+7572,43,FIFA World Cup,3,2018,2018-06-28,778,Japan,789,Poland,0,1,5,7
+7577,43,FIFA World Cup,3,2018,2018-06-15,788,Morocco,797,Iran,0,1,5,2
+7543,43,FIFA World Cup,3,2018,2018-06-20,797,Iran,772,Spain,0,1,2,6
+7525,43,FIFA World Cup,3,2018,2018-06-14,796,Russia,799,Saudi Arabia,5,0,6,2
+7566,43,FIFA World Cup,3,2018,2018-06-27,794,Mexico,790,Sweden,0,3,7,3
+8651,43,FIFA World Cup,3,2018,2018-07-07,790,Sweden,768,England,0,2,1,6
+7567,43,FIFA World Cup,3,2018,2018-06-27,791,South Korea,770,Germany,2,0,3,8
+7541,43,FIFA World Cup,3,2018,2018-06-19,769,Colombia,778,Japan,1,2,3,6
+8655,43,FIFA World Cup,3,2018,2018-07-10,771,France,782,Belgium,1,0,4,5
+8657,43,FIFA World Cup,3,2018,2018-07-14,782,Belgium,768,England,2,0,4,5
+7540,43,FIFA World Cup,3,2018,2018-06-19,796,Russia,774,Egypt,3,1,7,4
+8652,43,FIFA World Cup,3,2018,2018-07-07,796,Russia,785,Croatia,2,2,6,8
+7563,43,FIFA World Cup,3,2018,2018-06-26,776,Denmark,771,France,0,0,4,2
+7556,43,FIFA World Cup,3,2018,2018-06-24,778,Japan,787,Senegal,2,2,2,5
+7559,43,FIFA World Cup,3,2018,2018-06-25,799,Saudi Arabia,774,Egypt,2,1,6,1
+3793185,43,FIFA World Cup,55,1990,1990-06-24,781,Brazil,779,Argentina,0,1,11,4
+3889149,43,FIFA World Cup,54,1986,1986-06-29,779,Argentina,770,Germany,3,2,8,6
+3889148,43,FIFA World Cup,54,1986,1986-06-26,779,Argentina,782,Belgium,2,0,6,5
+3750191,43,FIFA World Cup,54,1986,1986-06-22,779,Argentina,768,England,2,1,4,6
+3888720,43,FIFA World Cup,51,1974,1974-07-07,941,Netherlands,770,Germany,1,2,10,10
+3888719,43,FIFA World Cup,51,1974,1974-07-03,941,Netherlands,781,Brazil,2,0,3,1
+3888718,43,FIFA World Cup,51,1974,1974-06-30,2721,German DR,941,Netherlands,0,2,4,6
+3888717,43,FIFA World Cup,51,1974,1974-06-26,941,Netherlands,779,Argentina,4,0,5,1
+3888716,43,FIFA World Cup,51,1974,1974-06-19,941,Netherlands,790,Sweden,0,0,5,2
+3750180,43,FIFA World Cup,51,1974,1974-06-22,2721,German DR,770,Germany,1,0,3,10
+3889218,43,FIFA World Cup,272,1970,1970-06-14,781,Brazil,784,Peru,4,2,8,6
+3889217,43,FIFA World Cup,272,1970,1970-06-10,781,Brazil,905,Romania,3,2,8,4
+3888702,43,FIFA World Cup,272,1970,1970-06-21,781,Brazil,914,Italy,4,1,4,6
+3888701,43,FIFA World Cup,272,1970,1970-06-18,781,Brazil,783,Uruguay,3,1,5,2
+3888700,43,FIFA World Cup,272,1970,1970-06-07,781,Brazil,768,England,1,0,6,4
+3888699,43,FIFA World Cup,272,1970,1970-06-04,781,Brazil,17469,Czechoslovakia,4,1,3,6
+3888854,43,FIFA World Cup,270,1962,1962-05-30,781,Brazil,794,Mexico,2,0,7,2
+3888705,43,FIFA World Cup,269,1958,1958-06-29,781,Brazil,790,Sweden,5,2,13,8
+3888704,43,FIFA World Cup,269,1958,1958-06-24,781,Brazil,771,France,5,2,8,5
+3942819,55,UEFA Euro,282,2024,2024-07-10,941,Netherlands,768,England,1,2,3,0
+3943043,55,UEFA Euro,282,2024,2024-07-14,772,Spain,768,England,2,1,10,2
+3942752,55,UEFA Euro,282,2024,2024-07-09,772,Spain,771,France,2,1,4,6
+3942382,55,UEFA Euro,282,2024,2024-07-06,941,Netherlands,909,Turkey,2,1,3,7
+3942349,55,UEFA Euro,282,2024,2024-07-05,780,Portugal,771,France,0,0,11,4
+3930180,55,UEFA Euro,282,2024,2024-06-25,941,Netherlands,915,Austria,2,3,5,2
+3930171,55,UEFA Euro,282,2024,2024-06-20,776,Denmark,768,England,1,1,4,2
+3942227,55,UEFA Euro,282,2024,2024-07-06,768,England,773,Switzerland,1,1,4,2
+3942226,55,UEFA Euro,282,2024,2024-07-05,772,Spain,770,Germany,2,1,1,5
+3938645,55,UEFA Euro,282,2024,2024-06-26,911,Ukraine,782,Belgium,0,0,2,7
+3930184,55,UEFA Euro,282,2024,2024-06-26,912,Czech Republic,909,Turkey,1,2,3,7
+3941022,55,UEFA Euro,282,2024,2024-07-02,915,Austria,909,Turkey,1,2,10,4
+3941021,55,UEFA Euro,282,2024,2024-07-02,905,Romania,941,Netherlands,0,3,4,12
+3941020,55,UEFA Euro,282,2024,2024-07-01,780,Portugal,944,Slovenia,0,0,11,4
+3941019,55,UEFA Euro,282,2024,2024-07-01,771,France,782,Belgium,1,0,5,2
+3941018,55,UEFA Euro,282,2024,2024-06-30,772,Spain,2138,Georgia,4,1,13,3
+3941017,55,UEFA Euro,282,2024,2024-06-30,768,England,908,Slovakia,2,1,9,1
+3930182,55,UEFA Euro,282,2024,2024-06-25,776,Denmark,786,Serbia,0,0,8,2
+3930179,55,UEFA Euro,282,2024,2024-06-24,906,Albania,772,Spain,0,1,2,7
+3940983,55,UEFA Euro,282,2024,2024-06-29,770,Germany,776,Denmark,2,0,6,6
+3940878,55,UEFA Euro,282,2024,2024-06-29,773,Switzerland,914,Italy,2,0,4,6
+3930177,55,UEFA Euro,282,2024,2024-06-23,942,Scotland,916,Hungary,0,1,2,6
+3930173,55,UEFA Euro,282,2024,2024-06-21,941,Netherlands,771,France,0,0,3,6
+3930172,55,UEFA Euro,282,2024,2024-06-20,772,Spain,914,Italy,1,0,5,2
+3930167,55,UEFA Euro,282,2024,2024-06-19,785,Croatia,906,Albania,2,2,3,1
+3930168,55,UEFA Euro,282,2024,2024-06-19,770,Germany,916,Hungary,2,0,11,7
+3930165,55,UEFA Euro,282,2024,2024-06-17,915,Austria,771,France,0,1,6,2
+3930164,55,UEFA Euro,282,2024,2024-06-17,782,Belgium,908,Slovakia,0,1,5,7
+3930161,55,UEFA Euro,282,2024,2024-06-15,914,Italy,906,Albania,2,1,5,3
+3938637,55,UEFA Euro,282,2024,2024-06-16,789,Poland,941,Netherlands,1,2,3,6
+3938640,55,UEFA Euro,282,2024,2024-06-21,908,Slovakia,911,Ukraine,1,2,4,4
+3938642,55,UEFA Euro,282,2024,2024-06-22,2138,Georgia,912,Czech Republic,1,1,5,11
+3938639,55,UEFA Euro,282,2024,2024-06-18,909,Turkey,2138,Georgia,3,1,5,5
+3938641,55,UEFA Euro,282,2024,2024-06-21,789,Poland,915,Austria,1,3,4,3
+3938644,55,UEFA Euro,282,2024,2024-06-26,2138,Georgia,780,Portugal,2,0,1,11
+3938643,55,UEFA Euro,282,2024,2024-06-25,771,France,789,Poland,1,1,11,3
+3938638,55,UEFA Euro,282,2024,2024-06-17,905,Romania,911,Ukraine,3,0,3,8
+3930183,55,UEFA Euro,282,2024,2024-06-26,908,Slovakia,905,Romania,1,1,5,1
+3930181,55,UEFA Euro,282,2024,2024-06-25,768,England,944,Slovenia,0,0,6,0
+3930178,55,UEFA Euro,282,2024,2024-06-24,785,Croatia,914,Italy,1,1,2,11
+3930176,55,UEFA Euro,282,2024,2024-06-23,773,Switzerland,770,Germany,1,1,2,9
+3930175,55,UEFA Euro,282,2024,2024-06-22,782,Belgium,905,Romania,2,0,7,7
+3930174,55,UEFA Euro,282,2024,2024-06-22,909,Turkey,780,Portugal,0,3,9,1
+3930170,55,UEFA Euro,282,2024,2024-06-20,944,Slovenia,786,Serbia,1,1,4,9
+3930169,55,UEFA Euro,282,2024,2024-06-19,942,Scotland,773,Switzerland,1,1,5,8
+3930166,55,UEFA Euro,282,2024,2024-06-18,780,Portugal,912,Czech Republic,2,1,13,0
+3930163,55,UEFA Euro,282,2024,2024-06-16,786,Serbia,768,England,0,1,2,1
+3930162,55,UEFA Euro,282,2024,2024-06-16,944,Slovenia,776,Denmark,1,1,5,9
+3930160,55,UEFA Euro,282,2024,2024-06-15,772,Spain,785,Croatia,3,0,5,0
+3930159,55,UEFA Euro,282,2024,2024-06-15,916,Hungary,773,Switzerland,1,3,2,6
+3930158,55,UEFA Euro,282,2024,2024-06-14,770,Germany,942,Scotland,5,1,5,0
+3795108,55,UEFA Euro,43,2020,2021-07-02,773,Switzerland,772,Spain,1,1,9,13
+3788769,55,UEFA Euro,43,2020,2021-06-21,796,Russia,776,Denmark,1,4,1,7
+3788766,55,UEFA Euro,43,2020,2021-06-20,914,Italy,907,Wales,1,0,7,1
+3795220,55,UEFA Euro,43,2020,2021-07-06,914,Italy,772,Spain,1,1,1,6
+3788761,55,UEFA Euro,43,2020,2021-06-18,790,Sweden,908,Slovakia,1,0,7,6
+3788764,55,UEFA Euro,43,2020,2021-06-19,780,Portugal,770,Germany,2,4,6,3
+3788773,55,UEFA Euro,43,2020,2021-06-23,780,Portugal,771,France,2,2,0,1
+3788755,55,UEFA Euro,43,2020,2021-06-16,909,Turkey,907,Wales,0,2,10,7
+3788754,55,UEFA Euro,43,2020,2021-06-16,914,Italy,773,Switzerland,3,0,3,2
+3788762,55,UEFA Euro,43,2020,2021-06-19,772,Spain,789,Poland,1,1,7,1
+3788760,55,UEFA Euro,43,2020,2021-06-18,785,Croatia,912,Czech Republic,1,1,4,4
+3788747,55,UEFA Euro,43,2020,2021-06-13,915,Austria,2358,North Macedonia,3,1,4,0
+3788741,55,UEFA Euro,43,2020,2021-06-11,909,Turkey,914,Italy,0,3,2,8
+3795109,55,UEFA Euro,43,2020,2021-07-03,912,Czech Republic,776,Denmark,1,2,9,7
+3795187,55,UEFA Euro,43,2020,2021-07-03,911,Ukraine,768,England,0,4,3,2
+3788770,55,UEFA Euro,43,2020,2021-06-21,2358,North Macedonia,941,Netherlands,0,3,5,7
+3795506,55,UEFA Euro,43,2020,2021-07-11,914,Italy,768,England,1,1,3,5
+3794688,55,UEFA Euro,43,2020,2021-06-29,768,England,770,Germany,2,0,3,3
+3794692,55,UEFA Euro,43,2020,2021-06-29,790,Sweden,911,Ukraine,1,2,6,2
+3794686,55,UEFA Euro,43,2020,2021-06-28,785,Croatia,772,Spain,3,5,1,8
+3794687,55,UEFA Euro,43,2020,2021-06-27,782,Belgium,780,Portugal,1,0,0,3
+3794685,55,UEFA Euro,43,2020,2021-06-26,914,Italy,915,Austria,2,1,4,3
+3788774,55,UEFA Euro,43,2020,2021-06-23,770,Germany,916,Hungary,2,2,6,1
+3788771,55,UEFA Euro,43,2020,2021-06-22,785,Croatia,942,Scotland,3,1,5,7
+3788772,55,UEFA Euro,43,2020,2021-06-22,912,Czech Republic,768,England,0,1,4,6
+3788768,55,UEFA Euro,43,2020,2021-06-21,1835,Finland,782,Belgium,0,2,0,5
+3788767,55,UEFA Euro,43,2020,2021-06-21,911,Ukraine,915,Austria,0,1,4,9
+3788753,55,UEFA Euro,43,2020,2021-06-16,1835,Finland,796,Russia,0,1,1,4
+3788765,55,UEFA Euro,43,2020,2021-06-20,773,Switzerland,909,Turkey,3,1,8,8
+3788763,55,UEFA Euro,43,2020,2021-06-19,916,Hungary,771,France,1,1,1,3
+3788759,55,UEFA Euro,43,2020,2021-06-18,768,England,942,Scotland,0,0,6,5
+3788758,55,UEFA Euro,43,2020,2021-06-17,911,Ukraine,2358,North Macedonia,2,1,5,5
+3788757,55,UEFA Euro,43,2020,2021-06-17,776,Denmark,782,Belgium,1,2,2,4
+3788745,55,UEFA Euro,43,2020,2021-06-13,768,England,785,Croatia,1,0,1,1
+3795107,55,UEFA Euro,43,2020,2021-07-02,782,Belgium,914,Italy,1,2,9,5
+3795221,55,UEFA Euro,43,2020,2021-07-07,768,England,776,Denmark,2,1,6,5
+3794689,55,UEFA Euro,43,2020,2021-06-26,907,Wales,776,Denmark,0,4,1,9
+3788746,55,UEFA Euro,43,2020,2021-06-13,941,Netherlands,911,Ukraine,3,2,5,1
+3794691,55,UEFA Euro,43,2020,2021-06-28,771,France,773,Switzerland,3,3,8,5
+3794690,55,UEFA Euro,43,2020,2021-06-27,941,Netherlands,912,Czech Republic,0,2,6,5
+3788756,55,UEFA Euro,43,2020,2021-06-17,941,Netherlands,915,Austria,2,0,2,5
+3788749,55,UEFA Euro,43,2020,2021-06-14,789,Poland,908,Slovakia,1,2,5,2
+3788750,55,UEFA Euro,43,2020,2021-06-14,772,Spain,790,Sweden,0,0,6,1
+3788748,55,UEFA Euro,43,2020,2021-06-14,942,Scotland,912,Czech Republic,0,2,6,6
+3788751,55,UEFA Euro,43,2020,2021-06-15,771,France,770,Germany,1,0,3,5
+3788752,55,UEFA Euro,43,2020,2021-06-15,916,Hungary,780,Portugal,0,3,0,6
+3788742,55,UEFA Euro,43,2020,2021-06-12,776,Denmark,1835,Finland,0,1,9,0
+3788775,55,UEFA Euro,43,2020,2021-06-23,908,Slovakia,772,Spain,0,5,0,7
+3788776,55,UEFA Euro,43,2020,2021-06-23,790,Sweden,789,Poland,3,2,6,10
+3788743,55,UEFA Euro,43,2020,2021-06-12,782,Belgium,796,Russia,3,0,2,4
+3788744,55,UEFA Euro,43,2020,2021-06-12,907,Wales,773,Switzerland,1,1,4,12
+4020846,53,UEFA Women's Euro,315,2025,2025-07-27,865,England Women's,863,Spain Women's,1,1,3,7
+4020077,53,UEFA Women's Euro,315,2025,2025-07-23,857,Germany Women's,863,Spain Women's,0,1,6,6
+4020005,53,UEFA Women's Euro,315,2025,2025-07-22,865,England Women's,855,Italy Women's,2,1,10,3
+4018357,53,UEFA Women's Euro,315,2025,2025-07-19,861,France Women's,857,Germany Women's,1,1,5,2
+4018356,53,UEFA Women's Euro,315,2025,2025-07-18,863,Spain Women's,860,Switzerland Women's,2,0,6,0
+4018355,53,UEFA Women's Euro,315,2025,2025-07-17,858,Sweden Women's,865,England Women's,2,2,6,6
+4018354,53,UEFA Women's Euro,315,2025,2025-07-16,852,Norway Women's,855,Italy Women's,1,2,7,7
+3998858,53,UEFA Women's Euro,315,2025,2025-07-13,865,England Women's,2456,Wales,6,1,6,2
+3998859,53,UEFA Women's Euro,315,2025,2025-07-13,851,Netherlands Women's,861,France Women's,2,5,4,5
+3998857,53,UEFA Women's Euro,315,2025,2025-07-12,29167,Poland Women's,853,Denmark Women's,3,2,1,5
+3998856,53,UEFA Women's Euro,315,2025,2025-07-12,858,Sweden Women's,857,Germany Women's,4,1,6,2
+3998855,53,UEFA Women's Euro,315,2025,2025-07-11,855,Italy Women's,863,Spain Women's,1,3,5,9
+3998854,53,UEFA Women's Euro,315,2025,2025-07-11,864,Portugal Women's,854,Belgium Women's,1,2,5,3
+3998852,53,UEFA Women's Euro,315,2025,2025-07-10,920,WNT Finland,860,Switzerland Women's,1,1,4,4
+3998853,53,UEFA Women's Euro,315,2025,2025-07-10,852,Norway Women's,862,Iceland Women's,4,3,11,1
+3998851,53,UEFA Women's Euro,315,2025,2025-07-09,865,England Women's,851,Netherlands Women's,4,0,4,5
+3998850,53,UEFA Women's Euro,315,2025,2025-07-09,861,France Women's,2456,Wales,4,1,5,3
+3998848,53,UEFA Women's Euro,315,2025,2025-07-08,29167,Poland Women's,858,Sweden Women's,0,3,2,7
+3998849,53,UEFA Women's Euro,315,2025,2025-07-08,857,Germany Women's,853,Denmark Women's,2,1,10,3
+3998846,53,UEFA Women's Euro,315,2025,2025-07-07,864,Portugal Women's,855,Italy Women's,1,1,4,5
+3998847,53,UEFA Women's Euro,315,2025,2025-07-07,863,Spain Women's,854,Belgium Women's,6,2,11,1
+3998844,53,UEFA Women's Euro,315,2025,2025-07-06,860,Switzerland Women's,862,Iceland Women's,2,0,6,1
+3998845,53,UEFA Women's Euro,315,2025,2025-07-06,852,Norway Women's,920,WNT Finland,2,1,6,6
+3998837,53,UEFA Women's Euro,315,2025,2025-07-02,860,Switzerland Women's,852,Norway Women's,1,2,7,3
+3998842,53,UEFA Women's Euro,315,2025,2025-07-05,2456,Wales,851,Netherlands Women's,0,3,4,4
+3998843,53,UEFA Women's Euro,315,2025,2025-07-05,861,France Women's,865,England Women's,2,1,1,6
+3998840,53,UEFA Women's Euro,315,2025,2025-07-04,857,Germany Women's,29167,Poland Women's,2,0,7,4
+3998839,53,UEFA Women's Euro,315,2025,2025-07-03,863,Spain Women's,864,Portugal Women's,5,0,10,1
+3998838,53,UEFA Women's Euro,315,2025,2025-07-03,854,Belgium Women's,855,Italy Women's,0,1,4,5
+3998836,53,UEFA Women's Euro,315,2025,2025-07-02,862,Iceland Women's,920,WNT Finland,0,1,5,6
+3998841,53,UEFA Women's Euro,315,2025,2025-07-04,853,Denmark Women's,858,Sweden Women's,0,1,4,8
+3835331,53,UEFA Women's Euro,106,2022,2022-07-13,858,Sweden Women's,860,Switzerland Women's,2,1,3,2
+3835324,53,UEFA Women's Euro,106,2022,2022-07-09,851,Netherlands Women's,858,Sweden Women's,1,1,3,6
+3844384,53,UEFA Women's Euro,106,2022,2022-07-20,865,England Women's,863,Spain Women's,2,1,5,8
+3847567,53,UEFA Women's Euro,106,2022,2022-07-31,865,England Women's,857,Germany Women's,2,1,8,7
+3845506,53,UEFA Women's Euro,106,2022,2022-07-26,865,England Women's,858,Sweden Women's,4,0,4,6
+3835335,53,UEFA Women's Euro,106,2022,2022-07-15,2457,Northern Ireland,865,England Women's,0,5,0,9
+3835323,53,UEFA Women's Euro,106,2022,2022-07-09,864,Portugal Women's,860,Switzerland Women's,2,2,9,2
+3835325,53,UEFA Women's Euro,106,2022,2022-07-10,861,France Women's,855,Italy Women's,5,1,3,7
+3835320,53,UEFA Women's Euro,106,2022,2022-07-07,852,Norway Women's,2457,Northern Ireland,4,1,9,1
+3845507,53,UEFA Women's Euro,106,2022,2022-07-27,857,Germany Women's,861,France Women's,2,1,4,3
+3844387,53,UEFA Women's Euro,106,2022,2022-07-23,861,France Women's,851,Netherlands Women's,1,0,10,5
+3844385,53,UEFA Women's Euro,106,2022,2022-07-21,857,Germany Women's,859,Austria Women's,2,0,7,6
+3844386,53,UEFA Women's Euro,106,2022,2022-07-22,858,Sweden Women's,854,Belgium Women's,1,0,13,2
+3835342,53,UEFA Women's Euro,106,2022,2022-07-18,862,Iceland Women's,861,France Women's,1,1,6,4
+3835337,53,UEFA Women's Euro,106,2022,2022-07-16,853,Denmark Women's,863,Spain Women's,0,1,2,9
+3835338,53,UEFA Women's Euro,106,2022,2022-07-16,920,WNT Finland,857,Germany Women's,0,3,0,13
+3835330,53,UEFA Women's Euro,106,2022,2022-07-12,857,Germany Women's,863,Spain Women's,2,0,4,6
+3835329,53,UEFA Women's Euro,106,2022,2022-07-12,853,Denmark Women's,920,WNT Finland,1,0,6,1
+3835322,53,UEFA Women's Euro,106,2022,2022-07-08,857,Germany Women's,853,Denmark Women's,4,0,7,4
+3835332,53,UEFA Women's Euro,106,2022,2022-07-13,851,Netherlands Women's,864,Portugal Women's,3,2,7,4
+3835327,53,UEFA Women's Euro,106,2022,2022-07-11,865,England Women's,852,Norway Women's,8,0,2,3
+3835326,53,UEFA Women's Euro,106,2022,2022-07-10,854,Belgium Women's,862,Iceland Women's,1,1,2,10
+3835341,53,UEFA Women's Euro,106,2022,2022-07-18,855,Italy Women's,854,Belgium Women's,0,1,12,1
+3835340,53,UEFA Women's Euro,106,2022,2022-07-17,858,Sweden Women's,864,Portugal Women's,5,0,7,2
+3835339,53,UEFA Women's Euro,106,2022,2022-07-17,860,Switzerland Women's,851,Netherlands Women's,1,4,6,2
+3835336,53,UEFA Women's Euro,106,2022,2022-07-15,859,Austria Women's,852,Norway Women's,1,0,6,5
+3835334,53,UEFA Women's Euro,106,2022,2022-07-14,855,Italy Women's,862,Iceland Women's,1,1,6,1
+3835328,53,UEFA Women's Euro,106,2022,2022-07-11,859,Austria Women's,2457,Northern Ireland,2,0,6,3
+3835333,53,UEFA Women's Euro,106,2022,2022-07-14,861,France Women's,854,Belgium Women's,2,1,11,1
+3835321,53,UEFA Women's Euro,106,2022,2022-07-08,863,Spain Women's,920,WNT Finland,4,1,17,0
+3835319,53,UEFA Women's Euro,106,2022,2022-07-06,865,England Women's,859,Austria Women's,1,0,5,4
+3904629,72,Women's World Cup,107,2023,2023-08-16,1205,Australia Women's,865,England Women's,1,3,6,5
+3906390,72,Women's World Cup,107,2023,2023-08-20,863,Spain Women's,865,England Women's,1,0,7,3
+3906389,72,Women's World Cup,107,2023,2023-08-19,858,Sweden Women's,1205,Australia Women's,2,0,0,3
+3904628,72,Women's World Cup,107,2023,2023-08-15,863,Spain Women's,858,Sweden Women's,2,1,3,3
+3893806,72,Women's World Cup,107,2023,2023-07-26,863,Spain Women's,6045,Zambia Women's,5,0,9,3
+3893801,72,Women's World Cup,107,2023,2023-07-24,1203,Brazil Women's,16803,Panama Women's,4,0,13,1
+3893797,72,Women's World Cup,107,2023,2023-07-23,851,Netherlands Women's,864,Portugal Women's,1,0,3,1
+3893822,72,Women's World Cup,107,2023,2023-07-31,1210,Japan Women's,863,Spain Women's,4,0,0,3
+3893814,72,Women's World Cup,107,2023,2023-07-29,858,Sweden Women's,855,Italy Women's,5,0,7,3
+3893790,72,Women's World Cup,107,2023,2023-07-21,1213,Nigeria Women's,1206,Canada Women's,0,0,6,7
+3901832,72,Women's World Cup,107,2023,2023-08-08,16802,Colombia Women's,1212,Jamaica Women's,1,0,7,3
+3902968,72,Women's World Cup,107,2023,2023-08-12,1205,Australia Women's,861,France Women's,0,0,8,12
+3902967,72,Women's World Cup,107,2023,2023-08-12,865,England Women's,16802,Colombia Women's,2,1,5,3
+3901797,72,Women's World Cup,107,2023,2023-08-06,858,Sweden Women's,1214,United States Women's,0,0,3,9
+3901796,72,Women's World Cup,107,2023,2023-08-06,851,Netherlands Women's,1216,South Africa Women's,2,0,6,5
+3902240,72,Women's World Cup,107,2023,2023-08-11,863,Spain Women's,851,Netherlands Women's,2,1,8,2
+3902239,72,Women's World Cup,107,2023,2023-08-11,1210,Japan Women's,858,Sweden Women's,1,2,4,3
+3893808,72,Women's World Cup,107,2023,2023-07-27,1214,United States Women's,851,Netherlands Women's,1,1,11,1
+3901833,72,Women's World Cup,107,2023,2023-08-08,861,France Women's,2391,Morocco Women's,4,0,0,2
+3893826,72,Women's World Cup,107,2023,2023-08-01,864,Portugal Women's,1214,United States Women's,0,0,1,6
+3901736,72,Women's World Cup,107,2023,2023-08-07,1205,Australia Women's,853,Denmark Women's,2,0,4,2
+3901735,72,Women's World Cup,107,2023,2023-08-07,865,England Women's,1213,Nigeria Women's,0,0,6,5
+3901734,72,Women's World Cup,107,2023,2023-08-05,1210,Japan Women's,852,Norway Women's,3,1,6,1
+3901733,72,Women's World Cup,107,2023,2023-08-05,860,Switzerland Women's,863,Spain Women's,1,5,0,11
+3893823,72,Women's World Cup,107,2023,2023-07-31,1832,Costa Rica Women's,6045,Zambia Women's,1,3,3,7
+3893811,72,Women's World Cup,107,2023,2023-07-28,865,England Women's,853,Denmark Women's,1,0,9,2
+3893812,72,Women's World Cup,107,2023,2023-07-28,1204,Argentina Women's,1216,South Africa Women's,2,2,4,3
+3893813,72,Women's World Cup,107,2023,2023-07-28,1207,China PR Women's,2355,Haiti Women's,1,0,4,4
+3893810,72,Women's World Cup,107,2023,2023-07-27,864,Portugal Women's,16769,Vietnam Women's,2,0,9,1
+3893809,72,Women's World Cup,107,2023,2023-07-27,1205,Australia Women's,1213,Nigeria Women's,2,3,15,2
+3893807,72,Women's World Cup,107,2023,2023-07-26,1206,Canada Women's,16768,Republic of Ireland Women's,2,1,3,5
+3893804,72,Women's World Cup,107,2023,2023-07-25,860,Switzerland Women's,852,Norway Women's,0,0,2,7
+3893788,72,Women's World Cup,107,2023,2023-07-20,1205,Australia Women's,16768,Republic of Ireland Women's,1,0,6,7
+3893798,72,Women's World Cup,107,2023,2023-07-23,861,France Women's,1212,Jamaica Women's,0,0,12,2
+3893789,72,Women's World Cup,107,2023,2023-07-21,1106,Philippines Women's,860,Switzerland Women's,0,2,0,3
+3893794,72,Women's World Cup,107,2023,2023-07-22,865,England Women's,2355,Haiti Women's,1,0,7,3
+3893792,72,Women's World Cup,107,2023,2023-07-22,1214,United States Women's,16769,Vietnam Women's,3,0,9,0
+3893791,72,Women's World Cup,107,2023,2023-07-21,863,Spain Women's,1832,Costa Rica Women's,3,0,22,1
+3893787,72,Women's World Cup,107,2023,2023-07-20,1215,New Zealand Women's,852,Norway Women's,1,0,8,2
+3893834,72,Women's World Cup,107,2023,2023-08-03,2391,Morocco Women's,16802,Colombia Women's,1,0,4,3
+3893833,72,Women's World Cup,107,2023,2023-08-03,1211,Korea Republic Women's,857,Germany Women's,1,1,2,2
+3893832,72,Women's World Cup,107,2023,2023-08-02,1212,Jamaica Women's,1203,Brazil Women's,0,0,0,6
+3893831,72,Women's World Cup,107,2023,2023-08-02,1216,South Africa Women's,855,Italy Women's,3,2,5,5
+3893830,72,Women's World Cup,107,2023,2023-08-02,1204,Argentina Women's,858,Sweden Women's,0,2,1,4
+3893829,72,Women's World Cup,107,2023,2023-08-02,16803,Panama Women's,861,France Women's,3,6,0,11
+3893828,72,Women's World Cup,107,2023,2023-08-01,1207,China PR Women's,865,England Women's,1,6,3,4
+3893827,72,Women's World Cup,107,2023,2023-08-01,16769,Vietnam Women's,851,Netherlands Women's,0,7,3,9
+3893825,72,Women's World Cup,107,2023,2023-08-01,2355,Haiti Women's,853,Denmark Women's,0,2,7,5
+3893824,72,Women's World Cup,107,2023,2023-07-31,16768,Republic of Ireland Women's,1213,Nigeria Women's,0,0,2,3
+3893821,72,Women's World Cup,107,2023,2023-07-31,1206,Canada Women's,1205,Australia Women's,0,4,5,4
+3893820,72,Women's World Cup,107,2023,2023-07-30,852,Norway Women's,1106,Philippines Women's,6,0,8,3
+3893819,72,Women's World Cup,107,2023,2023-07-30,1211,Korea Republic Women's,2391,Morocco Women's,0,1,6,3
+3893818,72,Women's World Cup,107,2023,2023-07-30,857,Germany Women's,16802,Colombia Women's,1,2,4,6
+3893817,72,Women's World Cup,107,2023,2023-07-30,860,Switzerland Women's,1215,New Zealand Women's,0,0,4,5
+3893816,72,Women's World Cup,107,2023,2023-07-29,16803,Panama Women's,1212,Jamaica Women's,0,1,7,9
+3893815,72,Women's World Cup,107,2023,2023-07-29,861,France Women's,1203,Brazil Women's,2,1,5,3
+3893805,72,Women's World Cup,107,2023,2023-07-26,1210,Japan Women's,1832,Costa Rica Women's,2,0,9,0
+3893803,72,Women's World Cup,107,2023,2023-07-25,1215,New Zealand Women's,1106,Philippines Women's,0,1,7,0
+3893802,72,Women's World Cup,107,2023,2023-07-25,16802,Colombia Women's,1211,Korea Republic Women's,2,0,4,3
+3893800,72,Women's World Cup,107,2023,2023-07-24,855,Italy Women's,1204,Argentina Women's,1,0,5,2
+3893799,72,Women's World Cup,107,2023,2023-07-24,857,Germany Women's,2391,Morocco Women's,6,0,6,2
+3893796,72,Women's World Cup,107,2023,2023-07-23,858,Sweden Women's,1216,South Africa Women's,2,1,13,1
+3893795,72,Women's World Cup,107,2023,2023-07-22,853,Denmark Women's,1207,China PR Women's,1,0,6,4
+3893793,72,Women's World Cup,107,2023,2023-07-22,6045,Zambia Women's,1210,Japan Women's,0,5,1,6
+22949,72,Women's World Cup,30,2019,2019-06-12,857,Germany Women's,863,Spain Women's,1,0,2,7
+22943,72,Women's World Cup,30,2019,2019-06-11,1214,United States Women's,1107,Thailand Women's,13,0,9,0
+22944,72,Women's World Cup,30,2019,2019-06-11,1209,Chile Women's,858,Sweden Women's,0,2,0,11
+22961,72,Women's World Cup,30,2019,2019-06-14,1210,Japan Women's,866,Scotland Women's,2,1,6,6
+22964,72,Women's World Cup,30,2019,2019-06-15,851,Netherlands Women's,1208,Cameroon Women's,3,1,0,3
+68357,72,Women's World Cup,30,2019,2019-06-22,852,Norway Women's,1205,Australia Women's,1,1,12,5
+22933,72,Women's World Cup,30,2019,2019-06-09,1205,Australia Women's,855,Italy Women's,1,2,6,3
+22963,72,Women's World Cup,30,2019,2019-06-14,1212,Jamaica Women's,855,Italy Women's,0,5,4,7
+68311,72,Women's World Cup,30,2019,2019-06-18,1212,Jamaica Women's,1205,Australia Women's,1,4,1,8
+22940,72,Women's World Cup,30,2019,2019-06-10,1204,Argentina Women's,1210,Japan Women's,0,0,0,5
+22945,72,Women's World Cup,30,2019,2019-06-12,1213,Nigeria Women's,1211,Korea Republic Women's,2,0,3,6
+22956,72,Women's World Cup,30,2019,2019-06-13,1216,South Africa Women's,1207,China PR Women's,0,1,3,7
+22966,72,Women's World Cup,30,2019,2019-06-15,1206,Canada Women's,1215,New Zealand Women's,2,0,8,1
+68344,72,Women's World Cup,30,2019,2019-06-20,851,Netherlands Women's,1206,Canada Women's,2,1,0,1
+68345,72,Women's World Cup,30,2019,2019-06-20,858,Sweden Women's,1214,United States Women's,0,2,1,5
+69163,72,Women's World Cup,30,2019,2019-06-24,858,Sweden Women's,1206,Canada Women's,1,0,3,8
+68346,72,Women's World Cup,30,2019,2019-06-20,1208,Cameroon Women's,1215,New Zealand Women's,2,1,3,4
+68355,72,Women's World Cup,30,2019,2019-06-22,857,Germany Women's,1213,Nigeria Women's,3,0,13,5
+69301,72,Women's World Cup,30,2019,2019-07-06,865,England Women's,858,Sweden Women's,1,2,4,2
+69137,72,Women's World Cup,30,2019,2019-06-23,861,France Women's,1203,Brazil Women's,2,1,7,4
+69208,72,Women's World Cup,30,2019,2019-06-29,857,Germany Women's,858,Sweden Women's,1,2,5,3
+22936,72,Women's World Cup,30,2019,2019-06-09,865,England Women's,866,Scotland Women's,2,1,9,2
+22973,72,Women's World Cup,30,2019,2019-06-16,858,Sweden Women's,1107,Thailand Women's,5,1,6,0
+68337,72,Women's World Cup,30,2019,2019-06-19,1210,Japan Women's,865,England Women's,0,2,4,6
+22981,72,Women's World Cup,30,2019,2019-06-17,1211,Korea Republic Women's,852,Norway Women's,1,2,4,3
+22974,72,Women's World Cup,30,2019,2019-06-16,1214,United States Women's,1209,Chile Women's,3,0,15,1
+22924,72,Women's World Cup,30,2019,2019-06-08,852,Norway Women's,1213,Nigeria Women's,3,0,5,5
+69321,72,Women's World Cup,30,2019,2019-07-07,1214,United States Women's,851,Netherlands Women's,2,0,8,2
+22983,72,Women's World Cup,30,2019,2019-06-17,1207,China PR Women's,863,Spain Women's,0,0,0,8
+68312,72,Women's World Cup,30,2019,2019-06-18,855,Italy Women's,1203,Brazil Women's,0,1,4,7
+22921,72,Women's World Cup,30,2019,2019-06-07,861,France Women's,1211,Korea Republic Women's,4,0,13,1
+22926,72,Women's World Cup,30,2019,2019-06-08,857,Germany Women's,1207,China PR Women's,1,0,8,3
+22930,72,Women's World Cup,30,2019,2019-06-08,863,Spain Women's,1216,South Africa Women's,3,1,5,2
+22934,72,Women's World Cup,30,2019,2019-06-09,1203,Brazil Women's,1212,Jamaica Women's,3,0,10,3
+22939,72,Women's World Cup,30,2019,2019-06-10,1206,Canada Women's,1208,Cameroon Women's,1,0,10,4
+69202,72,Women's World Cup,30,2019,2019-06-28,861,France Women's,1214,United States Women's,1,2,7,3
+22942,72,Women's World Cup,30,2019,2019-06-11,1215,New Zealand Women's,851,Netherlands Women's,0,1,1,8
+22948,72,Women's World Cup,30,2019,2019-06-12,861,France Women's,852,Norway Women's,2,1,9,5
+22955,72,Women's World Cup,30,2019,2019-06-13,1205,Australia Women's,1203,Brazil Women's,3,2,4,3
+22962,72,Women's World Cup,30,2019,2019-06-14,865,England Women's,1204,Argentina Women's,1,0,7,0
+22980,72,Women's World Cup,30,2019,2019-06-17,1213,Nigeria Women's,861,France Women's,0,1,2,9
+22984,72,Women's World Cup,30,2019,2019-06-17,1216,South Africa Women's,857,Germany Women's,0,4,1,8
+68338,72,Women's World Cup,30,2019,2019-06-19,866,Scotland Women's,1204,Argentina Women's,3,3,5,1
+68343,72,Women's World Cup,30,2019,2019-06-20,1107,Thailand Women's,1209,Chile Women's,0,2,3,4
+68362,72,Women's World Cup,30,2019,2019-06-23,865,England Women's,1208,Cameroon Women's,3,0,4,2
+69191,72,Women's World Cup,30,2019,2019-06-25,855,Italy Women's,1207,China PR Women's,2,0,0,9
+69188,72,Women's World Cup,30,2019,2019-06-25,851,Netherlands Women's,1210,Japan Women's,2,1,3,2
+69199,72,Women's World Cup,30,2019,2019-06-27,852,Norway Women's,865,England Women's,0,3,2,5
+69258,72,Women's World Cup,30,2019,2019-07-02,865,England Women's,1214,United States Women's,1,2,2,2
+69284,72,Women's World Cup,30,2019,2019-07-03,851,Netherlands Women's,858,Sweden Women's,1,0,4,12
+69205,72,Women's World Cup,30,2019,2019-06-29,855,Italy Women's,851,Netherlands Women's,0,2,2,2
+69161,72,Women's World Cup,30,2019,2019-06-24,863,Spain Women's,1214,United States Women's,1,2,2,3

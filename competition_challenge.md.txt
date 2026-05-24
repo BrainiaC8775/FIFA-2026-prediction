@@ -1,0 +1,44 @@
+💪 Competition challenge
+The 2026 World Cup has two phases:
+
+Group stage (matches 1–72): The 48 teams are split into 12 groups of 4. Every team plays the other 3 teams in their group once. The best teams from each group advance to the next phase.
+Knockout stage (matches 73–104): Single-elimination rounds — Round of 32, Round of 16, Quarter-finals, Semi-finals, and the Final. Lose once and you're out. Crucially, the two teams playing in each knockout match are not known in advance: they depend on who qualified from the group stage.
+Submit predictions for every match in both phases. For each match you need to predict:
+
+Score — the exact final scoreline (e.g. 2-1 means the home team scores 2, the away team scores 1). For knockout matches, the score is the result after 90 minutes and extra time — the penalty shootout is not included.
+Corners — the number of corner kicks awarded in the match
+Yellow cards — the number of yellow cards shown in the match
+Red cards — the number of red cards shown in the match
+For group stage matches, also predict:
+
+Winning team — which team wins the individual match (use home, away, or draw)
+For knockout round matches, also predict:
+
+Matchup — which two teams you predict will be playing in that slot. Because the bracket is determined by group stage results, you need to predict which teams advance far enough to meet in each round.
+Match winner — which team wins the match (use home or away)
+Penalties — whether the match goes to a penalty shootout (True or False)
+Scoring system
+Category	Condition	Points
+Score	Exact scoreline	25
+Score	Correct goal difference, wrong score	10
+Score	Correct total goals, wrong score	10
+Corners	Exact number	10
+Corners	Off by 2	5
+Yellow cards	Exact number	10
+Yellow cards	Off by 1	5
+Red cards	Exact number	5
+Winning team (group stage only)	Correct	40
+Matchup (knockout only)	Both teams correct	20
+Matchup (knockout only)	One team correct	10
+Match winner (knockout only)	Correct	20
+Penalties (knockout only)	Correct	5
+All points for a match are multiplied by the round factor:
+
+Round	Multiplier
+Group stage	×1
+Round of 32	×1
+Round of 16	×2
+Quarter-final	×4
+Semi-final	×8
+Third-place playoff	×8
+Final	×16

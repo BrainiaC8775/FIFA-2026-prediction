@@ -1,0 +1,105 @@
+match_id,round,multiplier,home_team,away_team,score,total_corners,total_yellow_cards,total_red_cards,winning_team,matchup_home,matchup_away,match_winner,penalties
+1,Group Stage,1,Mexico,South Africa,1-0,9,4,0,home,,,,
+2,Group Stage,1,South Korea,Czech Republic,1-0,13,5,0,home,,,,
+3,Group Stage,1,Canada,Bosnia-Herzegovina,2-0,12,6,0,home,,,,
+4,Group Stage,1,United States,Paraguay,1-0,9,4,0,home,,,,
+5,Group Stage,1,Australia,Turkey,1-0,11,3,0,home,,,,
+6,Group Stage,1,Qatar,Switzerland,1-1,10,5,0,draw,,,,
+7,Group Stage,1,Brazil,Morocco,1-0,11,3,0,home,,,,
+8,Group Stage,1,Haiti,Scotland,1-1,8,3,1,draw,,,,
+9,Group Stage,1,Germany,Curaçao,5-0,11,3,0,home,,,,
+10,Group Stage,1,Netherlands,Japan,1-1,9,3,0,draw,,,,
+11,Group Stage,1,Ivory Coast,Ecuador,0-0,8,4,0,draw,,,,
+12,Group Stage,1,Sweden,Tunisia,1-0,11,4,0,home,,,,
+13,Group Stage,1,Spain,Cabo Verde,6-0,11,3,0,home,,,,
+14,Group Stage,1,Belgium,Egypt,1-0,11,3,0,home,,,,
+15,Group Stage,1,Saudi Arabia,Uruguay,0-1,8,4,0,away,,,,
+16,Group Stage,1,Iran,New Zealand,2-0,5,4,0,home,,,,
+17,Group Stage,1,Austria,Jordan,1-0,11,5,0,home,,,,
+18,Group Stage,1,France,Senegal,1-0,11,4,0,home,,,,
+19,Group Stage,1,Iraq,Norway,1-1,9,3,0,draw,,,,
+20,Group Stage,1,Argentina,Algeria,2-0,9,3,0,home,,,,
+21,Group Stage,1,Portugal,Democratic Republic of the Congo,2-0,12,2,0,home,,,,
+22,Group Stage,1,England,Croatia,1-0,9,3,0,home,,,,
+23,Group Stage,1,Ghana,Panama,1-1,7,4,0,draw,,,,
+24,Group Stage,1,Uzbekistan,Colombia,0-1,9,4,0,away,,,,
+25,Group Stage,1,Czech Republic,South Africa,1-0,8,5,1,home,,,,
+26,Group Stage,1,Switzerland,Bosnia-Herzegovina,2-0,11,3,0,home,,,,
+27,Group Stage,1,Canada,Qatar,1-0,12,6,0,home,,,,
+28,Group Stage,1,Mexico,South Korea,1-1,10,4,0,draw,,,,
+29,Group Stage,1,Turkey,Paraguay,1-0,11,4,0,home,,,,
+30,Group Stage,1,United States,Australia,1-0,7,4,0,home,,,,
+31,Group Stage,1,Scotland,Morocco,0-1,8,3,0,away,,,,
+32,Group Stage,1,Brazil,Haiti,4-0,12,3,0,home,,,,
+33,Group Stage,1,Tunisia,Japan,0-1,11,2,0,away,,,,
+34,Group Stage,1,Netherlands,Sweden,2-0,6,3,0,home,,,,
+35,Group Stage,1,Germany,Ivory Coast,2-0,11,3,0,home,,,,
+36,Group Stage,1,Ecuador,Curaçao,3-0,9,3,0,home,,,,
+37,Group Stage,1,Spain,Saudi Arabia,2-0,9,4,0,home,,,,
+38,Group Stage,1,Belgium,Iran,1-1,9,3,0,draw,,,,
+39,Group Stage,1,Uruguay,Cabo Verde,5-0,9,3,0,home,,,,
+40,Group Stage,1,New Zealand,Egypt,1-0,10,3,0,home,,,,
+41,Group Stage,1,Argentina,Austria,2-0,9,4,0,home,,,,
+42,Group Stage,1,France,Iraq,2-0,10,3,0,home,,,,
+43,Group Stage,1,Norway,Senegal,1-1,10,4,0,draw,,,,
+44,Group Stage,1,Jordan,Algeria,1-1,9,4,0,draw,,,,
+45,Group Stage,1,Portugal,Uzbekistan,2-0,12,3,0,home,,,,
+46,Group Stage,1,England,Ghana,2-0,9,4,0,home,,,,
+47,Group Stage,1,Panama,Croatia,0-1,8,3,0,away,,,,
+48,Group Stage,1,Colombia,Democratic Republic of the Congo,2-0,8,2,0,home,,,,
+49,Group Stage,1,Switzerland,Canada,1-0,9,4,0,home,,,,
+50,Group Stage,1,Bosnia-Herzegovina,Qatar,1-1,9,3,0,draw,,,,
+51,Group Stage,1,Scotland,Brazil,0-1,10,4,0,away,,,,
+52,Group Stage,1,Morocco,Haiti,2-0,8,3,0,home,,,,
+53,Group Stage,1,Czech Republic,Mexico,1-1,10,5,1,draw,,,,
+54,Group Stage,1,South Africa,South Korea,0-1,8,4,0,away,,,,
+55,Group Stage,1,Curaçao,Ivory Coast,0-2,9,4,0,away,,,,
+56,Group Stage,1,Ecuador,Germany,0-1,11,3,0,away,,,,
+57,Group Stage,1,Japan,Sweden,2-0,6,3,0,home,,,,
+58,Group Stage,1,Tunisia,Netherlands,0-1,14,3,0,away,,,,
+59,Group Stage,1,United States,Turkey,1-0,11,4,0,home,,,,
+60,Group Stage,1,Paraguay,Australia,1-0,7,4,0,home,,,,
+61,Group Stage,1,Norway,France,1-1,9,3,0,draw,,,,
+62,Group Stage,1,Senegal,Iraq,1-0,10,4,0,home,,,,
+63,Group Stage,1,Cabo Verde,Saudi Arabia,0-2,9,4,0,away,,,,
+64,Group Stage,1,Uruguay,Spain,0-1,12,2,0,away,,,,
+65,Group Stage,1,Egypt,Iran,0-1,7,3,0,away,,,,
+66,Group Stage,1,New Zealand,Belgium,1-1,9,3,0,draw,,,,
+67,Group Stage,1,Panama,England,0-1,8,3,0,away,,,,
+68,Group Stage,1,Croatia,Ghana,1-0,8,5,0,home,,,,
+69,Group Stage,1,Colombia,Portugal,1-0,9,3,0,home,,,,
+70,Group Stage,1,Democratic Republic of the Congo,Uzbekistan,0-1,9,3,0,away,,,,
+71,Group Stage,1,Algeria,Austria,1-1,9,5,0,draw,,,,
+72,Group Stage,1,Jordan,Argentina,0-1,13,5,0,away,,,,
+73,Round of 32,1,Mexico,Canada,1-0,9,4,0,,Mexico,Canada,home,False
+74,Round of 32,1,Brazil,Japan,1-0,13,3,0,,Brazil,Japan,home,False
+75,Round of 32,1,Germany,Czech Republic,1-0,12,3,0,,Germany,Czech Republic,home,False
+76,Round of 32,1,Netherlands,Morocco,1-0,7,3,0,,Netherlands,Morocco,home,False
+77,Round of 32,1,Ecuador,Senegal,1-0,10,3,1,,Ecuador,Senegal,home,False
+78,Round of 32,1,France,Qatar,1-0,10,3,0,,France,Qatar,home,False
+79,Round of 32,1,South Korea,Ivory Coast,1-0,12,5,0,,South Korea,Ivory Coast,home,False
+80,Round of 32,1,England,Ivory Coast,1-0,9,3,0,,England,Ivory Coast,home,False
+81,Round of 32,1,Belgium,Saudi Arabia,1-0,8,4,0,,Belgium,Saudi Arabia,home,False
+82,Round of 32,1,United States,Saudi Arabia,1-0,8,4,0,,United States,Saudi Arabia,home,False
+83,Round of 32,1,Portugal,Croatia,1-0,11,3,0,,Portugal,Croatia,home,False
+84,Round of 32,1,Spain,Austria,1-0,10,4,0,,Spain,Austria,home,False
+85,Round of 32,1,Switzerland,Uzbekistan,1-0,11,3,0,,Switzerland,Uzbekistan,home,False
+86,Round of 32,1,Australia,Iran,0-1,8,3,0,,Australia,Iran,home,False
+87,Round of 32,1,Argentina,Uruguay,1-0,8,4,0,,Argentina,Uruguay,home,False
+88,Round of 32,1,Colombia,Panama,1-0,6,4,0,,Colombia,Panama,home,False
+89,Round of 16,2,South Korea,Germany,1-0,14,5,0,,South Korea,Germany,away,False
+90,Round of 16,2,Brazil,Ecuador,1-0,11,3,0,,Brazil,Ecuador,home,False
+91,Round of 16,2,Netherlands,France,1-1,8,4,0,,Netherlands,France,away,False
+92,Round of 16,2,South Korea,England,1-0,11,4,0,,South Korea,England,away,False
+93,Round of 16,2,Portugal,Spain,1-1,14,2,0,,Portugal,Spain,away,False
+94,Round of 16,2,Belgium,United States,1-0,10,3,0,,Belgium,United States,home,False
+95,Round of 16,2,United States,Colombia,1-0,9,4,0,,United States,Colombia,home,False
+96,Round of 16,2,Canada,Argentina,1-0,15,7,0,,Canada,Argentina,away,False
+97,Quarter-final,4,Germany,Brazil,1-1,13,3,0,,Germany,Brazil,home,False
+98,Quarter-final,4,Spain,Belgium,1-0,10,3,0,,Spain,Belgium,home,False
+99,Quarter-final,4,France,England,1-0,9,3,0,,France,England,home,False
+100,Quarter-final,4,United States,Argentina,1-0,13,4,0,,United States,Argentina,home,False
+101,Semi-final,8,Germany,Spain,1-1,14,2,0,,Germany,Spain,home,False
+102,Semi-final,8,France,United States,1-0,10,3,0,,France,United States,home,False
+103,Third-place playoff,8,Spain,United States,1-0,11,3,0,,Spain,United States,home,False
+104,Final,16,Brazil,France,1-0,11,3,0,,Brazil,France,home,False
