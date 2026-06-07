@@ -42,20 +42,21 @@ these are training experiments / ablations. Copy them only if you also want to r
 
 ---
 
-## 3. Input Data Files (copy all 6)
+## 3. Input Data Files (copy all 5)
 
 | File | Size | Description |
 |---|---|---|
 | `group_fixtures.csv` | 5 KB | 72 group stage matches: match_id, group, home_team, away_team |
 | `knockout_slots.csv` | 3 KB | 32 KO match slots with round labels and multipliers |
 | `match_cards_corners.csv` | 388 KB | Per-match historical cards + corners (2006–2025 international matches). Used by `predict_cards_corners.py`. |
-| `tm_national_games.csv` | 1 MB | TransferMarkt historical international results. Used by `poisson_predict.py` for recent form. |
-| `International_match_stats.csv` | 13 MB | Full international match stats dataset. Used by `preprocessor_v2.dedup_datasets`. |
-| `Soccerway.csv` | 8 MB | Soccerway results. Used to build form features for the P2 model. |
+| `train_intl_v2.csv` | 1.7 MB | Preprocessed international match history (train split). Used to build form seeds for the S1 model. |
+| `test_intl_v2.csv` | 182 KB | Preprocessed international match history (test split). Concatenated with train to get full history. |
+| `sw_intl.csv` | 103 KB | Preprocessed Soccerway international results. Used to build form seeds for the P2 model. |
 
-> **Note:** `Club_game_stats.csv` (3 MB) and `club_basic.csv` (74 KB) are only needed
-> if you re-run `preprocessor_v2.py` standalone to regenerate training splits.
-> They are **not** required at inference time by `predict_wc2026.py`.
+> **Note:** The raw source files `tm_national_games.csv`, `International_match_stats.csv`,
+> and `Soccerway.csv` are **not** required at inference time — `predict_wc2026.py` loads
+> the preprocessed splits above directly. Those raw files are only needed if you re-run
+> `preprocessor_v2.py` to regenerate the splits from scratch.
 
 ---
 
@@ -78,44 +79,48 @@ Run the script from the folder that contains `models_dc_cat_v3/`, or change the 
 SAVE_DIR = "/path/to/your/models_dc_cat_v3"   # absolute path on the server
 ```
 
-### 4b. CSV paths in `predict_wc2026.py` (lines 96–97)
+### 4b. CSV paths in `predict_wc2026.py`
+
+All of these are relative to the working directory:
 
 ```python
+# lines 65–67 — preprocessed history for form seeds
+train_intl = pd.read_csv("train_intl_v2.csv")
+test_intl  = pd.read_csv("test_intl_v2.csv")
+sw_intl    = pd.read_csv("sw_intl.csv")
+
+# lines 96–97 — fixture files
 fixtures       = pd.read_csv("group_fixtures.csv")
 knockout_slots = pd.read_csv("knockout_slots.csv")
-```
 
-And in `predict_cards_corners.py` (called with):
-
-```python
+# called internally by predict_cards_corners.py
 build_predictions_for_fixtures(fixtures, cards_path="match_cards_corners.csv", ...)
 ```
 
-And in `poisson_predict.py` (line 195):
-
-```python
-national_history = load_nat_history("tm_national_games.csv")
-```
-
-All are relative paths. **Run from the directory containing all files**, or wrap
-the script with:
+**Run from the directory containing all files**, or wrap with:
 
 ```bash
 cd /path/to/deployment/folder && python predict_wc2026.py
 ```
 
-### 4c. `preprocessor_v2.py` hard-coded paths (lines 364–367)
+### 4c. `preprocessor_v2.py` and `poisson_predict.py` standalone paths (not needed for inference)
+
+These hard-coded paths only activate when those scripts are run **directly**, not when imported:
 
 ```python
+# preprocessor_v2.py lines 364–367 (standalone retraining only)
 INTL_PATH  = "International_match_stats.csv"
 CGS_PATH   = "Club_game_stats.csv"
 BASIC_PATH = "club_basic.csv"
 SW_PATH    = "Soccerway.csv"
+
+# poisson_predict.py line 195 (standalone only)
+national_history = load_nat_history("tm_national_games.csv")
 ```
 
-These only matter when `preprocessor_v2.py` is run **standalone** (not imported).
-`predict_wc2026.py` imports only `dedup_datasets()` and passes paths as arguments,
-so no change needed for inference.
+`predict_wc2026.py` imports only `dedup_datasets()` from `preprocessor_v2` and
+`qualified_teams` / `normalize_team_name` from `poisson_predict` — neither triggers
+these standalone paths. No changes needed for inference.
 
 ---
 
@@ -149,9 +154,9 @@ deploy/
 ├── group_fixtures.csv
 ├── knockout_slots.csv
 ├── match_cards_corners.csv
-├── tm_national_games.csv
-├── International_match_stats.csv
-├── Soccerway.csv
+├── train_intl_v2.csv
+├── test_intl_v2.csv
+├── sw_intl.csv
 └── models_dc_cat_v3/
     ├── final_s1_intl_home.cbm
     ├── final_s1_intl_away.cbm

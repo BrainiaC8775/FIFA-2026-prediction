@@ -405,8 +405,10 @@ def simulate_knockout_match(home, away):
     Returns (winner, home_goals, away_goals, on_pens: bool).
     """
     hi, ai = team_idx.get(home, 0), team_idx.get(away, 0)
-    lh = ko_lh_mat[hi, ai]
-    la = ko_la_mat[hi, ai]
+    # Average both bracket orientations so the result is truly neutral —
+    # the "home" slot assignment in knockout rounds shouldn't favour the host.
+    lh = (ko_lh_mat[hi, ai] + ko_la_mat[ai, hi]) / 2
+    la = (ko_la_mat[hi, ai] + ko_lh_mat[ai, hi]) / 2
     hg = np.random.poisson(lh)
     ag = np.random.poisson(la)
     if hg > ag:
@@ -634,42 +636,129 @@ standing_df.to_csv("wc2026_group_standings.csv", index=False)
 print("Saved: wc2026_group_standings.csv")
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 12. OUTPUT: KNOCKOUT BRACKET CSV (most likely path from MC)
+# 12. OUTPUT: KNOCKOUT BRACKET CSV — deterministic bracket propagation
 # ─────────────────────────────────────────────────────────────────────────────
+#
+# Strategy:
+#   Step A — resolve R32 home/away teams from MC frequencies with conflict
+#             detection (no team duplicated across slots).
+#   Step B — propagate winners/losers sequentially through R16 → QF → SF →
+#             3rd-place playoff → Final using symmetrised neutral lambdas.
+#             This guarantees a team eliminated in QF cannot appear in the SF.
 
+def _pick_team(counts_dict, already_assigned):
+    """Most-frequent team in counts_dict not yet in already_assigned."""
+    for team, _ in sorted(counts_dict.items(), key=lambda x: -x[1]):
+        if team not in already_assigned:
+            return team
+    return "TBD"
+
+def _ko_predict(home, away):
+    """
+    Predict outcome of a neutral KO match using form-seeded lambdas.
+    Uses the same per-match computation as the group stage (not the batch
+    matrices) so historical form is correctly reflected.
+    Returns (winner, loser, score_str, lh, la, p_home_win).
+    """
+    lh_ha, la_ha, lh_ah, la_ah = [], [], [], []
+    for tag, (m_home, m_away, dc_params, t2i) in models.items():
+        seed = hist_s1 if tag == "s1" else hist_p2
+        # orientation A: home is home
+        fr_ha = build_fixture_frame(home, away, KNOCKOUT_DATE, seed, is_neutral=1)
+        dc_h, dc_a = get_dc_lambdas_safe(home, away, dc_params, t2i)
+        X_ha = build_features(fr_ha.reset_index(drop=True), np.array([dc_h]), np.array([dc_a]))
+        lh_ha.append(float(np.clip(m_home.predict(X_ha), 0.05, 10)[0]))
+        la_ha.append(float(np.clip(m_away.predict(X_ha), 0.05, 10)[0]))
+        # orientation B: away is home — for symmetrisation
+        fr_ah = build_fixture_frame(away, home, KNOCKOUT_DATE, seed, is_neutral=1)
+        dc_h2, dc_a2 = get_dc_lambdas_safe(away, home, dc_params, t2i)
+        X_ah = build_features(fr_ah.reset_index(drop=True), np.array([dc_h2]), np.array([dc_a2]))
+        lh_ah.append(float(np.clip(m_home.predict(X_ah), 0.05, 10)[0]))
+        la_ah.append(float(np.clip(m_away.predict(X_ah), 0.05, 10)[0]))
+
+    # Symmetrised neutral lambdas
+    lh = (np.mean(lh_ha) + np.mean(la_ah)) / 2   # home team neutral expected goals
+    la = (np.mean(la_ha) + np.mean(lh_ah)) / 2   # away team neutral expected goals
+
+    pm  = poisson_prob_matrix(lh, la)
+    prb = outcome_probs(pm)
+    ph, pa = np.unravel_index(np.argmax(pm), pm.shape)
+    winner = home if prb[0] >= prb[2] else away
+    loser  = away if winner == home else home
+    p_win  = prb[0] if winner == home else prb[2]
+    return winner, loser, f"{ph}-{pa}", lh, la, round(float(p_win), 4)
+
+# ── Step A: resolve R32 teams, highest-confidence first ─────────────────────
+_r32_mids = list(
+    knockout_slots[knockout_slots["round"] == "Round of 32"]["match_id"].astype(int)
+)
+_r32_mids.sort(key=lambda m: -(
+    max(ko_home_counts[m].values(), default=0) +
+    max(ko_away_counts[m].values(), default=0)
+))
+_assigned = set()
+_r32_home = {}   # mid → home team
+_r32_away = {}   # mid → away team
+for _mid in _r32_mids:
+    _h = _pick_team(ko_home_counts[_mid], _assigned)
+    if _h != "TBD":
+        _assigned.add(_h)
+    _a = _pick_team(ko_away_counts[_mid], _assigned)
+    if _a != "TBD":
+        _assigned.add(_a)
+    _r32_home[_mid] = _h
+    _r32_away[_mid] = _a
+
+# ── Step B: seed slot→team map from knockout_slots schema ────────────────────
+_slot_team = {}   # slot string → team (e.g. "Winner Match 75" → "Germany")
+
+for _mid in _r32_mids:
+    _ks_row = knockout_slots[knockout_slots["match_id"] == _mid].iloc[0]
+    _slot_team[_ks_row["slot_home"]] = _r32_home[_mid]
+    _slot_team[_ks_row["slot_away"]] = _r32_away[_mid]
+
+# ── Step B: propagate round by round ────────────────────────────────────────
+_ROUNDS = ["Round of 32", "Round of 16", "Quarter-final",
+           "Semi-final", "Third-place playoff", "Final"]
+
+_bracket = {}   # mid → dict with all match info
+
+for _rnd in _ROUNDS:
+    for _, _ks in knockout_slots[knockout_slots["round"] == _rnd].sort_values("match_id").iterrows():
+        _mid  = int(_ks["match_id"])
+        _home = _slot_team.get(_ks["slot_home"], "TBD")
+        _away = _slot_team.get(_ks["slot_away"], "TBD")
+
+        if _home != "TBD" and _away != "TBD":
+            _w, _l, _sc, _lh, _la, _pw = _ko_predict(_home, _away)
+        else:
+            _w = _l = "TBD"; _sc = "TBD"; _lh = 1.2; _la = 0.9; _pw = 0.5
+
+        _bracket[_mid] = {
+            "home": _home, "away": _away,
+            "winner": _w,  "loser": _l,
+            "score": _sc,  "lh": _lh, "la": _la, "p_win": _pw,
+        }
+        # Expose for downstream slots
+        _slot_team[f"Winner Match {_mid}"] = _w
+        _slot_team[f"Loser Match {_mid}"]  = _l
+
+# ── Step C: build bracket_rows ───────────────────────────────────────────────
 bracket_rows = []
 for _, row in knockout_slots.sort_values("match_id").iterrows():
-    mid = int(row["match_id"])
-    most_likely_winner = max(ko_bracket_wins[mid], key=ko_bracket_wins[mid].get, default="TBD")
-    win_pct = round(ko_bracket_wins[mid].get(most_likely_winner, 0) / N_SIMS, 4) if ko_bracket_wins[mid] else 0.0
+    mid  = int(row["match_id"])
+    bm   = _bracket.get(mid, {})
+    pred_home_team = bm.get("home", "TBD")
+    pred_away_team = bm.get("away", "TBD")
+    most_likely_winner = bm.get("winner", "TBD")
+    det_score  = bm.get("score", "TBD")
+    win_pct    = bm.get("p_win", 0.0)
 
-    # Most likely home/away team from MC-tracked identity
-    pred_home_team = max(ko_home_counts[mid], key=ko_home_counts[mid].get) if ko_home_counts[mid] else "TBD"
-    pred_away_team = max(ko_away_counts[mid], key=ko_away_counts[mid].get) if ko_away_counts[mid] else "TBD"
+    pred_winner_side = "home" if most_likely_winner == pred_home_team else "away"
 
-    # Deterministic MAP score for the most likely matchup (clean H-A, no pens suffix)
-    if pred_home_team != "TBD" and pred_away_team != "TBD":
-        lh_d = ko_lh_mat[team_idx.get(pred_home_team, 0), team_idx.get(pred_away_team, 0)]
-        la_d = ko_la_mat[team_idx.get(pred_home_team, 0), team_idx.get(pred_away_team, 0)]
-        pm_d = poisson_prob_matrix(lh_d, la_d)
-        ph_d, pa_d = np.unravel_index(np.argmax(pm_d), pm_d.shape)
-        det_score = f"{ph_d}-{pa_d}"
-    else:
-        det_score = "TBD"
-
-    # Penalty prediction from MC frequency
     p_pens = round(ko_pens_counts[mid] / N_SIMS, 4)
-    pred_penalties = p_pens > 0.35   # threshold above historical ~28% mean; False dominates EV
+    pred_penalties = p_pens > 0.35
 
-    # Winner side
-    if most_likely_winner == pred_home_team:
-        pred_winner_side = "home"
-    elif most_likely_winner == pred_away_team:
-        pred_winner_side = "away"
-    else:
-        pred_winner_side = "home"
-
-    # Cards & corners for this matchup
     if pred_home_team != "TBD" and pred_away_team != "TBD":
         ko_cc = predict_cc_match(pred_home_team, pred_away_team, _cc_team_stats, _cc_globals)
     else:
